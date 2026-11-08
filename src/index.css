@@ -1,0 +1,332 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --color-canvas: #050505;
+  --color-surface-subtle: #0E0E0E;
+  --color-surface-card: #121212;
+  --color-surface-elevated: #181818;
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-metallic: #343434;
+
+  --color-metallic-silver: #A7A7A7;
+  --color-metallic-dark: #343434;
+
+  --color-key-orange: #FF6A00;
+  --color-key-yellow: #F5B900;
+  --color-key-cream: #F3E9D2;
+  --color-key-green: #174F37;
+  --color-key-lime: #A6E635;
+  --color-key-pink: #F08BAE;
+  --color-key-red: #9E3026;
+  --color-key-charcoal: #1E1E22;
+
+  --color-text-primary: #F5F5F5;
+  --color-text-secondary: #8E8E93;
+  --color-text-muted: #55555A;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #050505;
+  color: #F5F5F5;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+}
+
+code, pre, .font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2A2A2A;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A7A7A7;
+}
+
+/* Brushed Metallic Enclosure Styling */
+.metallic-chassis {
+  background: linear-gradient(145deg, #404040 0%, #2A2A2A 15%, #181818 45%, #222222 75%, #353535 100%);
+  box-shadow: 
+    0 25px 60px -15px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.metallic-chassis-silver {
+  background: linear-gradient(135deg, #E2E2E2 0%, #C8C8C8 25%, #9E9E9E 60%, #B8B8B8 85%, #EFEFEF 100%);
+  box-shadow: 
+    0 30px 70px -10px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(255, 255, 255, 0.5),
+    inset 0 2px 2px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.6);
+}
+
+.inner-keyboard-well {
+  background: #0A0A0C;
+  box-shadow: 
+    inset 0 4px 12px rgba(0, 0, 0, 0.95),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Metallic Screw Head */
+.screw-head {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #D4D4D4 0%, #7A7A7A 55%, #3D3D3D 100%);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    0 2px 3px rgba(0, 0, 0, 0.7);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.screw-head::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 1.5px;
+  background: #202020;
+  box-shadow: 0 0.5px 0.5px rgba(255, 255, 255, 0.3);
+  transform: rotate(45deg);
+}
+
+.screw-head::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 1.5px;
+  background: #202020;
+  box-shadow: 0 0.5px 0.5px rgba(255, 255, 255, 0.3);
+  transform: rotate(-45deg);
+}
+
+/* Digital Screen Scanline Effect */
+.digital-crt-screen {
+  background: radial-gradient(circle at 50% 50%, #151410 0%, #0A0906 100%);
+  box-shadow: 
+    inset 0 3px 8px rgba(0, 0, 0, 0.9),
+    inset 0 0 15px rgba(245, 185, 0, 0.03);
+  position: relative;
+}
+
+.digital-crt-screen::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 3px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Mechanical Keycap 3D Classes */
+.mechanical-key {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, filter 0.15s ease;
+  transform: translateY(0);
+}
+
+.mechanical-key:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.mechanical-key:active, .mechanical-key.key-pressed {
+  transform: translateY(4px) !important;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.8), inset 0 2px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Industrial Card Borders */
+.industrial-card {
+  background: #0D0D10;
+  border: 1px solid #242428;
+  position: relative;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+}
+
+.industrial-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+}
+
+/* Animations & Interactive Keyframes */
+@keyframes radarPulse {
+  0% { transform: scale(0.95); opacity: 0.9; }
+  50% { transform: scale(1.6); opacity: 0.3; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.radar-ring {
+  animation: radarPulse 2.4s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+@keyframes laserScan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(1000%); }
+}
+
+.laser-scanner {
+  animation: laserScan 4s linear infinite;
+}
+
+@keyframes keyglow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 106, 0, 0.4)); }
+  50% { filter: drop-shadow(0 0 12px rgba(255, 106, 0, 0.8)); }
+}
+
+.glow-pulse {
+  animation: keyglow 2s ease-in-out infinite;
+}
+
+/* Mouse spotlight layer */
+.spotlight-overlay {
+  pointer-events: none;
+  background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 106, 0, 0.04), transparent 45%);
+}
+
+/* Cinematic Section Dividers */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.2), rgba(255, 255, 255, 0.12), rgba(255, 106, 0, 0.2), transparent);
+}
+
+/* Hide default cursor on interactive chrome, while restoring native text cursor on form inputs & selectable fields */
+@media (pointer: fine) {
+  body, button, a, [role="button"], .mechanical-key, summary {
+    cursor: none;
+  }
+  input, textarea, select, [contenteditable="true"] {
+    cursor: text !important;
+  }
+}
+
+/* Mechanical Targeting Ring States */
+.cursor-hovered {
+  width: 38px !important;
+  height: 38px !important;
+  border-color: #FF6A00 !important;
+  background-color: rgba(255, 106, 0, 0.08) !important;
+  box-shadow: 0 0 14px rgba(255, 106, 0, 0.45), inset 0 0 6px rgba(255, 106, 0, 0.25) !important;
+}
+
+.cursor-hovered .crosshair-indicator {
+  opacity: 1 !important;
+}
+
+.cursor-clicking {
+  width: 22px !important;
+  height: 22px !important;
+  border-color: #FF8C33 !important;
+}
+
+/* Mechanical Crosshairs Indicators */
+.crosshair-indicator {
+  position: absolute;
+  background-color: #FF6A00;
+  opacity: 0;
+  transition: opacity 0.15s ease-out;
+  pointer-events: none;
+}
+
+.crosshair-v-top {
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.5px;
+  height: 4px;
+}
+
+.crosshair-v-bottom {
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.5px;
+  height: 4px;
+}
+
+.crosshair-h-left {
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 1.5px;
+}
+
+.crosshair-h-right {
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 1.5px;
+}
+
+/* Horizontal Infinite Marquee for Top Recognition Strip */
+@keyframes marqueeScroll {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 32s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+    overflow-x: auto;
+  }
+}
+
+
+
