@@ -26,12 +26,22 @@ export interface ExperienceItem {
   responsibilities: string[];
 }
 
+export interface TimelineActivity {
+  title: string;
+  category: 'Education' | 'Leadership' | 'Hackathon' | 'Certification' | 'Research' | 'Conference';
+  date?: string;
+  detail: string;
+  badge?: string;
+  iconName?: string;
+}
+
 export interface TimelineMilestone {
   year: string;
   title: string;
   subtitle: string;
   points: string[];
   highlight?: string;
+  activities?: TimelineActivity[];
 }
 
 export interface SkillCategory {
@@ -63,9 +73,22 @@ export interface Certification {
   id: string;
   title: string;
   issuer: string;
+  date: string;
+  certificateType: string;
   year: string;
-  category: 'AI & Data' | 'Leadership' | 'Software Engineering';
+  category: 'AI & Data' | 'Leadership' | 'Software Engineering' | 'Research & Innovation';
   credentialNote: string;
+  image: string;
+  originalPdf?: string;
+  certificateId?: string;
+  verificationCodes?: string;
+  additionalDetail?: string;
+  skills: string[];
+  brandColors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
 }
 
 export interface Achievement {
@@ -202,67 +225,260 @@ I believe in learning by building, leading through action and creating technolog
   timeline: [
     {
       year: '2023',
-      title: 'The Beginning',
-      subtitle: 'Foundational Exploration',
+      title: 'Academic Genesis & AI/ML Foundation',
+      subtitle: 'B.Tech in Artificial Intelligence & Machine Learning',
+      highlight: 'B.Tech AI & ML Genesis',
       points: [
-        'Started B.Tech in Artificial Intelligence & Machine Learning at VITS Bhopal.',
-        'Began rigorous exploration of programming fundamentals and core computer science.',
-        'Developed keen interest in neural networks and emerging AI technologies.'
+        'Began B.Tech journey in Artificial Intelligence & Machine Learning at Vaishnavi Institute of Technology & Science (VITS) Bhopal.',
+        'Immersed in core algorithmic programming, Data Structures, Python, Object-Oriented Design, and computational mathematics.',
+        'Initiated exploration of neural networks, foundational ML models, and emerging generative frameworks.',
+        'Formulated vision for bridging technology with real-world community challenges.'
       ],
-      highlight: 'Academic Journey Initiated'
+      activities: [
+        {
+          title: 'B.Tech AI & ML Inauguration',
+          category: 'Education',
+          date: 'August 2023',
+          detail: 'Enrolled in specialized B.Tech in Artificial Intelligence & Machine Learning at VITS Bhopal, maintaining an 8.39 CGPA track record.',
+          badge: 'VITS Bhopal · 8.39 CGPA'
+        },
+        {
+          title: 'Core Computer Science & Mathematics for ML',
+          category: 'Education',
+          date: '2023',
+          detail: 'Built rigorous foundations in Python, Java, discrete structures, and applied linear algebra for artificial intelligence.',
+          badge: 'Foundations'
+        }
+      ]
     },
     {
       year: '2024',
-      title: 'Building the Foundation',
-      subtitle: 'Team Building & Campus Leadership',
+      title: 'Team Setu & Institutional Leadership',
+      subtitle: 'Ecosystem Building & Career Enablement',
+      highlight: 'Founded Team Setu & T&P Role',
       points: [
-        'Founded Team Setu – a student innovation & hackathon collaboration cohort.',
-        'Appointed Student Placement Coordinator for the Training & Placement Cell.',
-        'Initiated cross-disciplinary technical projects and community problem-solving.',
-        'Engaged actively in hackathons, student meetups, and developer networks.'
+        'Founded Team Setu – a student innovation and hackathon cohort uniting developers, designers, and problem-solvers.',
+        'Appointed Student Placement Coordinator at VITS Training & Placement Cell, coordinating corporate recruitment drives and student skill readiness.',
+        'Started technical collaboration initiatives, hackathon teams, and peer-to-peer developer mentorship.',
+        'Began engineering exploratory AI prototypes for environmental and institutional problem spaces.'
       ],
-      highlight: 'Founded Team Setu'
+      activities: [
+        {
+          title: 'Founded Team Setu',
+          category: 'Leadership',
+          date: '2024',
+          detail: 'Founded Team Setu to create real-world technological solutions, leading 15+ student engineers across national hackathons.',
+          badge: 'Founder & Team Lead'
+        },
+        {
+          title: 'Student Placement Coordinator',
+          category: 'Leadership',
+          date: '2024 – Present',
+          detail: 'Appointed Coordinator at Training & Placement Cell, facilitating campus recruitment drives, industry workshops, and student analytics.',
+          badge: 'T&P Cell VITS'
+        },
+        {
+          title: 'Technical Collaboration & Innovation Initiatives',
+          category: 'Leadership',
+          date: '2024',
+          detail: 'Initiated cross-campus coding sprints, hackathon strategy groups, and developer meetups across Bhopal.',
+          badge: 'Collaborative Tech'
+        }
+      ]
     },
     {
       year: '2025',
-      title: 'Building & Exploring',
-      subtitle: 'Product Development & National Platforms',
+      title: 'National Innovation Platforms & Industry Job Simulations',
+      subtitle: 'Hackathons, Enterprise Simulators & Gemini Certification',
+      highlight: 'National Hackathons & 4 Industry Certs',
       points: [
-        'Engineered SkillBridge AI – an AI employability ecosystem for students and recruiters.',
-        'Developed AgriSense AI – smart agricultural crop monitoring solution.',
-        'Smart India Hackathon 2025 internal selection and institutional presentation.',
-        'Cleared Round 2 at KIT\'s IRF Ideathon in Kolhapur, Maharashtra.',
-        'AI for Bharat prototype shortlisted among prominent national submissions.'
+        'Smart India Hackathon (SIH) 2025 internal presentation, rigorous technical evaluation, and selection process.',
+        'KIT\'s Innovation and Research Foundation (KIT\'s IRF) IDEATHON 2025 participation in Kolhapur, Maharashtra.',
+        'Deloitte Data Analytics Job Simulation – Completed forensic technology and data storytelling simulation (August 31, 2025).',
+        'Tata GenAI Powered Data Analytics Job Simulation – Explored generative AI, delinquency prediction, and risk profiling (August 30, 2025).',
+        'Google for Education – Gemini Certified Student qualification awarded on October 15, 2025 (Valid through October 14, 2028).',
+        'Walmart Global Tech Advanced Software Engineering Job Simulation – Advanced data structures, software architecture, and relational design (October 19, 2025).'
       ],
-      highlight: 'Multiple AI Prototypes Shortlisted'
+      activities: [
+        {
+          title: 'Smart India Hackathon (SIH) 2025 Selection',
+          category: 'Hackathon',
+          date: '2025',
+          detail: 'Qualified through institutional internal screening with high-impact technology pitch and software architecture evaluation.',
+          badge: 'SIH 2025 Qualifier'
+        },
+        {
+          title: 'KIT\'s IRF IDEATHON 2025, Kolhapur',
+          category: 'Hackathon',
+          date: '2025',
+          detail: 'Competed at KIT\'s Innovation and Research Foundation, Kolhapur (supported by MSInS, MoSDEE, GoM and DST NIDHI i-TBI, MoST, GoI).',
+          badge: 'Round 2 Cleared'
+        },
+        {
+          title: 'Deloitte Data Analytics Job Simulation',
+          category: 'Certification',
+          date: 'August 31, 2025',
+          detail: 'Completed practical tasks in exploratory data analysis, forensic technology, and business reporting (Verification: AQ4Kdj2Wjxi7hwnQk).',
+          badge: 'Deloitte / Forage'
+        },
+        {
+          title: 'Tata GenAI Powered Data Analytics Simulation',
+          category: 'Certification',
+          date: 'August 30, 2025',
+          detail: 'Completed AI-driven collections strategy, risk profiling, and delinquency forecasting with generative AI (Verification: Trveq6cLS9LLK6YLt).',
+          badge: 'Tata / Forage'
+        },
+        {
+          title: 'Gemini Certified Student – University',
+          category: 'Certification',
+          date: 'October 15, 2025',
+          detail: 'Awarded Google for Education certification verifying core competency in Gemini AI, prompt design, and multimodal systems (Valid 2025–2028).',
+          badge: 'Google for Education'
+        },
+        {
+          title: 'Walmart Advanced Software Engineering Simulation',
+          category: 'Certification',
+          date: 'October 19, 2025',
+          detail: 'Completed tasks in advanced data structures, software architecture, relational database design, and data munging (Verification: wWBKJBbFWES2KGT6e).',
+          badge: 'Walmart Global Tech'
+        }
+      ]
     },
     {
       year: '2026',
-      title: 'Leadership & Innovation',
-      subtitle: 'National Recognition & Ecosystem Leadership',
+      title: 'Apex Leadership, Research Presentation & National Honors',
+      subtitle: 'Google Student Ambassador, SAC President & Flagship Challenges',
+      highlight: 'Top 5 Team in India & GSA 2026',
       points: [
-        'Selected as Google Student Ambassador 2026 representing campus tech innovation.',
-        'Selected for AICTE–MIC IDE Bootcamp in Solapur, Maharashtra.',
-        'Achieved Top 5 Team in India recognition in the IDE Bootcamp Innovation Challenge.',
-        'Selected for Ryzen AMD Slingshot national shortlist at VIT Bhopal.',
-        'Participated in the Claude One-Day Hackathon building AI-driven solutions.',
-        'Attended Madhya Pradesh Startup Summit as an invited delegate at Ravindra Bhawan, Bhopal.',
-        'Appointed President of the Student Activity Council (SAC) at VITS Bhopal.',
-        'Selected as Core Volunteer for Google Developer Group (GDG) Bhopal (Top 70+ applicants).',
-        'Continued collaborative engineering on GhatShield AI for environmental monitoring.'
+        'Google Student Ambassador (GSA) 2026 – Selected to champion Google AI & developer technologies on campus.',
+        'President – Student Activity Council (SAC), VITS Bhopal, leading campus-wide governance, hackathons, and culture.',
+        'Core Volunteer – Google Developer Group (GDG) Bhopal, selected from 70+ applicants for Central India tech festivals.',
+        'AICTE–MIC Innovation, Design and Entrepreneurship (IDE) Bootcamp, Solapur – Selected national delegate.',
+        'Top 5 Team in India – Earned national Top 5 Team in India honors in the Innovation Challenge at IDE Bootcamp.',
+        'Wadhwani Foundation Ignite Bootcamp – Idea to Plan (April 08, 2026) – 18 hours of ideation, business modeling, and financial planning.',
+        'AI for Bharat prototype shortlisted among prominent national entries targeting high-impact public domain solutions.',
+        'AMD Ryzen Slingshot selection at VIT Bhopal for high-performance computing and innovation.',
+        'KIT and innovation-related activities and cross-college engineering collaborations.',
+        'Madhya Pradesh Startup Summit 2026 – Invited delegate representing youth entrepreneurship at Ravindra Bhawan, Bhopal.',
+        'ISRO Bharatiya Antariksh Hackathon 2026 – Selected participant with successful space challenge idea submission (Certificate ID: 2026H2S06BAH-P24840).',
+        'ICESSM-2026 Research Paper Presentation – Presented "Machine Learning-Enabled Security for 5G Network Slicing: Challenges, Solutions, and Future Directions" at 4th International Conference.',
+        'Claude One-Day Hackathon – Participated in building autonomous LLM agents and prompt architectures.',
+        'BuildHub Digital Innovation Fest 2026 – Appointed Official Campus Ambassador (Certificate ID: BH-CA-2026061326).'
       ],
-      highlight: 'Top 5 in India & GSA 2026'
+      activities: [
+        {
+          title: 'Google Student Ambassador 2026',
+          category: 'Leadership',
+          date: '2026',
+          detail: 'Selected campus tech ambassador representing Google technologies, developer student programs, and AI workshops.',
+          badge: 'Google Student Ambassador'
+        },
+        {
+          title: 'President – Student Activity Council',
+          category: 'Leadership',
+          date: '2026 – Present',
+          detail: 'Elected President of the apex student body at VITS Bhopal, steering technical festivals, club governance, and administrative alignment.',
+          badge: 'Apex Campus Leadership'
+        },
+        {
+          title: 'Top 5 Team in India – AICTE/MIC IDE Bootcamp',
+          category: 'Hackathon',
+          date: '2026',
+          detail: 'Recognized among Top 5 Teams across all participating Indian engineering colleges in Solapur, Maharashtra.',
+          badge: 'National Top 5'
+        },
+        {
+          title: 'ICESSM-2026 Research Paper Presentation',
+          category: 'Research',
+          date: 'May 15–16, 2026',
+          detail: 'Presented research on "Machine Learning-Enabled Security for 5G Network Slicing" at Sri Balaji College, Jaipur.',
+          badge: 'Research Paper Presentation'
+        },
+        {
+          title: 'ISRO Bharatiya Antariksh Hackathon 2026',
+          category: 'Hackathon',
+          date: '2026',
+          detail: 'Participated in ISRO space challenge powered by Hack2skill with successful idea submission (ID: 2026H2S06BAH-P24840).',
+          badge: 'ISRO Participation'
+        },
+        {
+          title: 'Wadhwani Foundation Ignite Bootcamp',
+          category: 'Certification',
+          date: 'April 08, 2026',
+          detail: 'Completed 18 hours of venture validation, prototyping, business modeling, and financial planning.',
+          badge: 'Wadhwani Foundation'
+        },
+        {
+          title: 'Core Volunteer – GDG Bhopal',
+          category: 'Leadership',
+          date: '2026',
+          detail: 'Selected among top volunteers from 70+ applicants to organize DevFests, AI workshops, and community events.',
+          badge: 'GDG Bhopal'
+        },
+        {
+          title: 'BuildHub Digital Innovation Fest Ambassador',
+          category: 'Leadership',
+          date: '2026',
+          detail: 'Appointed Official Campus Ambassador for BuildHub Innovation & Entrepreneurship Club (ID: BH-CA-2026061326).',
+          badge: 'BuildHub Ambassador'
+        },
+        {
+          title: 'AMD Ryzen Slingshot Selection',
+          category: 'Hackathon',
+          date: '2026',
+          detail: 'Selected among top national contenders in high-performance computing challenge at VIT Bhopal.',
+          badge: 'AMD Ryzen Slingshot'
+        },
+        {
+          title: 'Madhya Pradesh Startup Summit 2026',
+          category: 'Conference',
+          date: '2026',
+          detail: 'Invited delegate representing university innovation at Ravindra Bhawan, Bhopal.',
+          badge: 'MP Startup Summit'
+        },
+        {
+          title: 'AI for Bharat Prototype Shortlist',
+          category: 'Hackathon',
+          date: '2026',
+          detail: 'Engineered AI-driven prototype for public good, shortlisted in nationwide evaluation rounds.',
+          badge: 'National Shortlist'
+        },
+        {
+          title: 'Claude One-Day Hackathon',
+          category: 'Hackathon',
+          date: '2026',
+          detail: 'Built rapid generative AI solutions and autonomous prompt pipelines in intensive hackathon.',
+          badge: 'Claude Hackathon'
+        }
+      ]
     },
     {
       year: '2027',
-      title: 'The Next Chapter',
-      subtitle: 'Graduation & Frontier AI Engineering',
+      title: 'B.Tech Graduation & Future Innovation Horizons',
+      subtitle: 'Expected B.Tech Completion & Frontier AI Deployment',
+      highlight: 'Expected B.Tech Graduation',
       points: [
-        'Expected B.Tech graduation in Artificial Intelligence & Machine Learning.',
-        'Aspiring to contribute to high-impact AI engineering and product innovation.',
-        'Exploring opportunities in research, tech entrepreneurship, and frontier AI systems.'
+        'Expected B.Tech graduation in Artificial Intelligence & Machine Learning from VITS Bhopal.',
+        'Future goals and upcoming innovation milestones: scaling enterprise-grade AI systems and autonomous agentic workflows.',
+        'Advancing research in decentralized 5G security, computer vision for public safety, and smart agriculture decision engines.',
+        'Scaling Team Setu into an impactful technology incubator and contributing to India\'s deep-tech developer ecosystem.'
       ],
-      highlight: 'Vision 2027'
+      activities: [
+        {
+          title: 'B.Tech AI & ML Graduation',
+          category: 'Education',
+          date: 'Expected 2027',
+          detail: 'Completion of 4-year degree in Artificial Intelligence & Machine Learning with established technical leadership.',
+          badge: 'Graduation Horizon'
+        },
+        {
+          title: 'Future Goals & Innovation Milestones',
+          category: 'Research',
+          date: '2027 Horizon',
+          detail: 'Focusing on production-scale generative systems, agentic architectures, and startup expansion.',
+          badge: 'Upcoming Milestones'
+        }
+      ]
     }
   ] as TimelineMilestone[],
 
@@ -589,68 +805,173 @@ I believe in learning by building, leading through action and creating technolog
 
   certifications: [
     {
-      id: 'deloitte-da',
-      title: 'Data Analytics Virtual Internship',
-      issuer: 'Deloitte',
+      id: 'cert-deloitte',
+      title: 'Data Analytics Job Simulation',
+      issuer: 'Deloitte / Forage',
+      date: 'August 31, 2025',
+      certificateType: 'Certificate of Completion',
       year: '2025',
       category: 'AI & Data',
-      credentialNote: 'Practical data analysis, dashboarding, business insights, and telemetry modeling simulation.'
+      credentialNote: 'Completed practical tasks in exploratory data analysis and forensic technology.',
+      image: '/assets/certificates/deloitte.jpg',
+      verificationCodes: 'Enrolment: AQ4Kdj2Wjxi7hwnQk | User: AW7Ae7HJN8Zpkv3do',
+      skills: ['Data Analysis', 'Forensic Technology', 'Data Storytelling', 'Deloitte Simulation'],
+      brandColors: {
+        primary: '#86BC25',
+        secondary: '#000000',
+        accent: '#86BC25'
+      }
     },
     {
-      id: 'gsa-cert',
-      title: 'Google Student Ambassador 2026',
-      issuer: 'Google Developer Programs',
+      id: 'cert-wadhwani',
+      title: 'Ignite Bootcamp – Idea to Plan',
+      issuer: 'Wadhwani Foundation',
+      date: 'April 08, 2026',
+      certificateType: 'Certificate of Participation',
       year: '2026',
       category: 'Leadership',
-      credentialNote: 'Official credential representing campus developer engagement and AI innovation.'
+      additionalDetail: 'This certificate confirms the completion of 18 hours of training.',
+      credentialNote: 'Gained essential skills in ideation, prototyping, business modeling, and financial planning.',
+      image: '/assets/certificates/wadhwani.jpg',
+      skills: ['Ideation', 'Prototyping', 'Business Modeling', 'Financial Planning'],
+      brandColors: {
+        primary: '#E03A3E',
+        secondary: '#F58220',
+        accent: '#F58220'
+      }
     },
     {
-      id: 'aicte-bootcamp-cert',
-      title: 'AICTE–MIC IDE Bootcamp 2026',
-      issuer: 'Ministry of Education Innovation Cell & AICTE',
+      id: 'cert-icessm',
+      title: 'Certificate of Presentation – ICESSM 2026',
+      issuer: 'Sri Balaji College of Engineering & Technology, Jaipur',
+      date: 'May 15–16, 2026',
+      certificateType: 'Certificate of Presentation',
       year: '2026',
-      category: 'Leadership',
-      credentialNote: 'National certification in technology venture validation, prototyping, and pitch defense.'
+      category: 'Research & Innovation',
+      additionalDetail: '4th International Conference on Engineering, Social Science & Management (ICESSM-2026)',
+      credentialNote: 'Presented research paper: "Machine Learning-Enabled Security for 5G Network Slicing: Challenges, Solutions, and Future Directions".',
+      image: '/assets/certificates/icessm.jpg',
+      skills: ['Machine Learning', '5G Network Slicing', 'Security Architectures', 'Research Defense'],
+      brandColors: {
+        primary: '#D4AF37',
+        secondary: '#1A365D',
+        accent: '#D4AF37'
+      }
     },
     {
-      id: 'buildhub-ca',
-      title: 'Campus Ambassador 2026',
-      issuer: 'BuildHub',
-      year: '2026',
-      category: 'Leadership',
-      credentialNote: 'Selected campus leader driving developer hackathon awareness and student participation.'
-    },
-    {
-      id: 'tata-genai',
-      title: 'GenAI Powered Data Analytics Virtual Internship',
-      issuer: 'Tata',
+      id: 'cert-gemini',
+      title: 'Gemini Certified Student – University',
+      issuer: 'Google for Education',
+      date: 'October 15, 2025',
+      certificateType: 'University Qualification',
       year: '2025',
       category: 'AI & Data',
-      credentialNote: 'Enterprise-grade generative AI analytics, pattern recognition, and predictive workflows.'
+      additionalDetail: 'Valid through: October 14, 2028',
+      credentialNote: 'Demonstrated knowledge, skills, and basic competencies needed to use Google AI.',
+      image: '/assets/certificates/gemini.png',
+      originalPdf: '/assets/aistudio/Gemini_Certificate_70fa0d55.pdf',
+      skills: ['Google AI', 'Gemini Models', 'Prompt Engineering', 'Multimodal Systems'],
+      brandColors: {
+        primary: '#4285F4',
+        secondary: '#34A853',
+        accent: '#FBBC05'
+      }
     },
     {
-      id: 'gemini-certified',
-      title: 'Gemini Certified University Student',
-      issuer: 'Google',
+      id: 'cert-isro',
+      title: 'Bharatiya Antariksh Hackathon 2026',
+      issuer: 'Indian Space Research Organisation (ISRO), powered by Hack2skill',
+      date: '2026',
+      certificateType: 'Certificate of Participation',
       year: '2026',
-      category: 'AI & Data',
-      credentialNote: 'Certified competency in prompt architecture, Gemini multimodality, and AI tool integration.'
+      category: 'Research & Innovation',
+      certificateId: '2026H2S06BAH-P24840',
+      additionalDetail: 'Participation and successful idea submission',
+      credentialNote: 'Recognized for enthusiasm, innovation, and commitment to solving real-world space challenges.',
+      image: '/assets/certificates/isro.png',
+      originalPdf: '/assets/aistudio/ISRO_Hackathon_Certificate__379936cd.pdf',
+      skills: ['Space Tech Solutions', 'Idea Submission', 'Geospatial Workflows', 'ISRO Hackathon'],
+      brandColors: {
+        primary: '#003399',
+        secondary: '#FF6600',
+        accent: '#FF6600'
+      }
     },
     {
-      id: 'walmart-swe',
+      id: 'cert-kit',
+      title: 'IDEATHON 2025',
+      issuer: 'KIT\'s Innovation and Research Foundation (KIT\'s IRF), Kolhapur',
+      date: '2025',
+      certificateType: 'Certificate of Participation',
+      year: '2025',
+      category: 'Research & Innovation',
+      additionalDetail: 'Supported by MSInS, MoSDEE, GoM and DST NIDHI i-TBI, MoST, GoI',
+      credentialNote: 'Awarded for remarkable participation reflecting innovation, intellect, and purposeful creation.',
+      image: '/assets/certificates/kit_irf.png',
+      originalPdf: '/assets/aistudio/KIT-CERTIFICATE_15a0021b.pdf',
+      skills: ['Innovation', 'Intellect', 'Purposeful Creation', 'Startup Ideation'],
+      brandColors: {
+        primary: '#FF6B00',
+        secondary: '#0A2540',
+        accent: '#E5A823'
+      }
+    },
+    {
+      id: 'cert-tata',
+      title: 'GenAI Powered Data Analytics Job Simulation',
+      issuer: 'Tata / Forage',
+      date: 'August 30, 2025',
+      certificateType: 'Certificate of Completion',
+      year: '2025',
+      category: 'AI & Data',
+      verificationCodes: 'Enrolment: Trveq6cLS9LLK6YLt | User: AW7Ae7HJN8Zpkv3do',
+      credentialNote: 'Completed exploratory data analysis, delinquency prediction with AI, and AI collections strategy.',
+      image: '/assets/certificates/tata_genai.png',
+      originalPdf: '/assets/aistudio/TATA_GEN_AI_Certificate_65961353.pdf',
+      skills: ['Exploratory Data Analysis', 'Risk Profiling', 'Delinquency Prediction', 'AI Collections'],
+      brandColors: {
+        primary: '#0072CE',
+        secondary: '#1B4E9B',
+        accent: '#0072CE'
+      }
+    },
+    {
+      id: 'cert-walmart',
       title: 'Advanced Software Engineering Job Simulation',
-      issuer: 'Walmart USA',
+      issuer: 'Walmart Global Tech / Forage',
+      date: 'October 19, 2025',
+      certificateType: 'Certificate of Completion',
       year: '2025',
       category: 'Software Engineering',
-      credentialNote: 'System design, data structures, enterprise scalability, and algorithmic optimization.'
+      verificationCodes: 'Enrolment: wWBKJBbFWES2KGT6e | User: AW7Ae7HJN8Zpkv3do',
+      credentialNote: 'Completed tasks in advanced data structures, software architecture, relational database design, and data munging.',
+      image: '/assets/certificates/walmart.png',
+      originalPdf: '/assets/aistudio/Walmart_Certificate__7a92929e.pdf',
+      skills: ['Advanced Data Structures', 'Software Architecture', 'Relational Database Design', 'Data Munging'],
+      brandColors: {
+        primary: '#0071CE',
+        secondary: '#FFC220',
+        accent: '#FFC220'
+      }
     },
     {
-      id: 'ide-entrepreneurship',
-      title: 'Entrepreneurship & Innovation Certification',
-      issuer: 'IDE Bootcamp, Solapur',
+      id: 'cert-buildhub',
+      title: 'Official Campus Ambassador – BuildHub Digital Innovation Fest 2026',
+      issuer: 'BuildHub – Innovation & Entrepreneurship Club',
+      date: '2026',
+      certificateType: 'Campus Ambassador Certificate',
       year: '2026',
       category: 'Leadership',
-      credentialNote: 'Hands-on validation of product-market fit, unit economics, and team governance.'
+      certificateId: 'BH-CA-2026061326',
+      credentialNote: 'Awarded for dedication, leadership, and commitment to promoting innovation, creativity, and entrepreneurship.',
+      image: '/assets/certificates/buildhub.png',
+      originalPdf: '/assets/aistudio/BuildHub_Certificate__5c26e209.pdf',
+      skills: ['Leadership', 'Innovation', 'Community Outreach', 'Entrepreneurship'],
+      brandColors: {
+        primary: '#FF6600',
+        secondary: '#0F1E36',
+        accent: '#FF6600'
+      }
     }
   ] as Certification[],
 

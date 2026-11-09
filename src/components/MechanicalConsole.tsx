@@ -405,7 +405,13 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
 
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#302B1D] pb-2.5 mb-2.5">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FF6A00] animate-pulse shadow-[0_0_8px_#FF6A00]" />
+              <span 
+                className="w-2.5 h-2.5 rounded-full animate-pulse transition-all duration-300" 
+                style={{ 
+                  backgroundColor: 'var(--theme-accent, #FF6A00)', 
+                  boxShadow: '0 0 8px var(--theme-accent, #FF6A00)' 
+                }} 
+              />
               <span className="text-[11px] font-mono tracking-widest text-[#F5B900] uppercase font-bold">
                 SYSTEM: PUSHKAR.VX // INDUSTRIAL CONSOLE v2.7
               </span>
@@ -451,7 +457,10 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
               <span className="text-sm sm:text-lg font-mono font-bold tracking-wide text-[#F3E9D2] drop-shadow-[0_0_8px_rgba(245,185,0,0.3)]">
                 &gt; {displayText}
               </span>
-              <span className="w-2.5 h-4 sm:h-5 bg-[#FF6A00] ml-1 animate-pulse inline-block" />
+              <span 
+                className="w-2.5 h-4 sm:h-5 ml-1 animate-pulse inline-block transition-colors duration-300" 
+                style={{ backgroundColor: 'var(--theme-accent, #FF6A00)' }} 
+              />
             </div>
 
             {lastExecutedKey && (
@@ -468,10 +477,16 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
           </div>
         </div>
 
-        {/* Small Orange Illuminated Mechanical Component */}
+        {/* Illuminated Mechanical Component with Dynamic Theme */}
         <div className="relative mb-5 flex items-center justify-between px-3 sm:px-4 py-2 rounded-xl bg-[#121215] border border-[#2B2B30] shadow-inner">
           <div className="flex items-center gap-2.5">
-            <div className="w-3.5 h-3.5 rounded-full bg-[#FF6A00] shadow-[0_0_12px_#FF6A00] flex items-center justify-center animate-pulse">
+            <div 
+              className="w-3.5 h-3.5 rounded-full flex items-center justify-center animate-pulse transition-all duration-300"
+              style={{
+                backgroundColor: 'var(--theme-accent, #FF6A00)',
+                boxShadow: '0 0 12px var(--theme-accent, #FF6A00)',
+              }}
+            >
               <div className="w-1.5 h-1.5 rounded-full bg-white" />
             </div>
             <span className="text-[11px] font-mono text-[#F5F5F5] font-semibold tracking-wider">
@@ -480,7 +495,10 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
           </div>
 
           {/* Key Tooltip Indicator */}
-          <div className="text-xs font-mono text-[#FF6A00] truncate max-w-[280px] sm:max-w-md">
+          <div 
+            className="text-xs font-mono truncate max-w-[280px] sm:max-w-md transition-colors duration-300"
+            style={{ color: 'var(--theme-accent-light, #FF6A00)' }}
+          >
             {hoveredKey ? (
               <span className="flex items-center gap-1.5 animate-in fade-in">
                 <span className="text-white font-bold">[{hoveredKey.char}]</span> {hoveredKey.label}: {hoveredKey.description}
@@ -556,7 +574,7 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
                   {isWide ? (
                     <div className="flex items-center justify-center gap-2">
                       <span className="tracking-wider">{key.char}</span>
-                      <ArrowUpRight className="w-4 h-4 text-[#FF6A00]" />
+                      <ArrowUpRight className="w-4 h-4 transition-colors duration-300" style={{ color: 'var(--theme-accent-light, #FF6A00)' }} />
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center">

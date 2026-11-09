@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, Navigation, Compass, Radio, CheckCircle, ArrowRight, Play, RotateCcw } from 'lucide-react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { OrbitalResearchSatellite } from './CyberneticEasterEggs';
 
 export const Explore: React.FC = () => {
   const locations = PORTFOLIO_DATA.locations;
@@ -39,9 +40,12 @@ export const Explore: React.FC = () => {
             BEYOND THE SCREEN.
           </h2>
         </div>
-        <p className="text-xs font-mono text-[#8E8E93]">
-          FIELD TELEMETRY · STATE-WIDE TRAVEL · IN-PERSON PODIUM VALIDATION
-        </p>
+        <div className="flex items-center gap-3">
+          <OrbitalResearchSatellite />
+          <p className="text-xs font-mono text-[#8E8E93]">
+            FIELD TELEMETRY · STATE-WIDE TRAVEL · IN-PERSON PODIUM VALIDATION
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">

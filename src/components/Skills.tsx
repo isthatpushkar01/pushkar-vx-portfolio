@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Cpu, Terminal, Sparkles, Layers, Database, Wrench, CheckCircle } from 'lucide-react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
+import { FloatingAssistantDrone } from './CyberneticEasterEggs';
 
 export const Skills: React.FC = () => {
   const skillCategories = PORTFOLIO_DATA.skills;
@@ -28,9 +29,12 @@ export const Skills: React.FC = () => {
             MY TECHNOLOGY STACK.
           </h2>
         </div>
-        <p className="text-xs font-mono text-[#8E8E93]">
-          TACTILE SWITCHES · MODULAR LIBRARIES · HARDWARE ACCELERATION
-        </p>
+        <div className="flex items-center gap-3">
+          <FloatingAssistantDrone />
+          <p className="text-xs font-mono text-[#8E8E93]">
+            TACTILE SWITCHES · MODULAR LIBRARIES · HARDWARE ACCELERATION
+          </p>
+        </div>
       </div>
 
       {/* Interactive Active Skill Inspector Banner */}

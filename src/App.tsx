@@ -20,7 +20,8 @@ import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { ResumeModal } from './components/ResumeModal';
 import { CustomCursor } from './components/CustomCursor';
-import { CinematicAudioIntro } from './components/CinematicAudioIntro';
+import { CommunityLogoWall } from './components/CommunityLogoWall';
+import { WebSlingingCyberHero } from './components/CyberneticEasterEggs';
 import { Terminal, Keyboard, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -53,13 +54,13 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen bg-[#08090B] text-[#F5F5F5] relative selection:bg-[#FF8A32]/30 selection:text-white"
+      className="min-h-screen bg-[#08090B] text-[#F5F5F5] relative selection:bg-[var(--theme-selection,rgba(255,106,0,0.3))] selection:text-white"
     >
       {/* Premium Custom Mechanical Reticle Cursor */}
       <CustomCursor />
 
-      {/* Cinematic Audio-Visual Initialization Modal */}
-      <CinematicAudioIntro />
+      {/* Subtle Distant Cybernetic Easter Egg */}
+      <WebSlingingCyberHero />
 
       {/* Official YouTube IFrame Player Persistent Node */}
       <div 
@@ -90,6 +91,9 @@ export default function App() {
         <Contact onOpenResume={() => setIsResumeOpen(true)} />
       </main>
 
+      {/* Distinctive Animated Bottom Community Logo Wall (Requirement 5) */}
+      <CommunityLogoWall />
+
       {/* Footer */}
       <Footer onOpenResume={() => setIsResumeOpen(true)} />
 
@@ -105,7 +109,7 @@ export default function App() {
           aria-label="Keyboard Shortcuts HUD"
           className="fixed bottom-4 right-4 z-40 hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#111116]/90 border border-[#2B2B36] backdrop-blur-md shadow-2xl text-[11px] font-mono text-[#8E8E93]"
         >
-          <Keyboard className="w-3.5 h-3.5 text-[#FF6A00]" />
+          <Keyboard className="w-3.5 h-3.5 text-[var(--theme-accent-light,#FF6A00)]" />
           <span>KEYBOARD NAV:</span>
           <span className="text-white font-bold bg-[#1C1C24] px-1.5 py-0.5 rounded border border-[#333340]">[P]</span>
           <span className="text-white font-bold bg-[#1C1C24] px-1.5 py-0.5 rounded border border-[#333340]">[O]</span>

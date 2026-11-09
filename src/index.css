@@ -32,6 +32,15 @@
 
 :root {
   color-scheme: dark;
+
+  /* Dynamic Track Theme Variables */
+  --theme-accent: #FF6A00;
+  --theme-accent-light: #FF8A32;
+  --theme-accent-deep: #D45500;
+  --theme-accent-glow: rgba(255, 106, 0, 0.45);
+  --theme-accent-glow-subtle: rgba(255, 106, 0, 0.16);
+  --theme-bg-ambient: rgba(255, 106, 0, 0.05);
+  --theme-selection: rgba(255, 106, 0, 0.3);
 }
 
 body {
@@ -214,25 +223,27 @@ code, pre, .font-mono {
 }
 
 @keyframes keyglow {
-  0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 106, 0, 0.4)); }
-  50% { filter: drop-shadow(0 0 12px rgba(255, 106, 0, 0.8)); }
+  0%, 100% { filter: drop-shadow(0 0 4px var(--theme-accent-glow, rgba(255, 106, 0, 0.4))); }
+  50% { filter: drop-shadow(0 0 12px var(--theme-accent-glow, rgba(255, 106, 0, 0.8))); }
 }
 
 .glow-pulse {
   animation: keyglow 2s ease-in-out infinite;
 }
 
-/* Mouse spotlight layer */
+/* Mouse spotlight layer with dynamic track ambient hue */
 .spotlight-overlay {
   pointer-events: none;
-  background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 106, 0, 0.04), transparent 45%);
+  background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--theme-bg-ambient, rgba(255, 106, 0, 0.05)), transparent 45%);
+  transition: background 0.5s ease;
 }
 
-/* Cinematic Section Dividers */
+/* Cinematic Section Dividers with dynamic theme glow */
 .section-divider {
   width: 100%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 106, 0, 0.2), rgba(255, 255, 255, 0.12), rgba(255, 106, 0, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, var(--theme-accent-glow, rgba(255, 106, 0, 0.2)), rgba(255, 255, 255, 0.12), var(--theme-accent-glow, rgba(255, 106, 0, 0.2)), transparent);
+  transition: background 0.5s ease;
 }
 
 /* Hide default cursor on interactive chrome, while restoring native text cursor on form inputs & selectable fields */
@@ -245,13 +256,13 @@ code, pre, .font-mono {
   }
 }
 
-/* Mechanical Targeting Ring States */
+/* Mechanical Targeting Ring States with dynamic track accents */
 .cursor-hovered {
   width: 38px !important;
   height: 38px !important;
-  border-color: #FF6A00 !important;
-  background-color: rgba(255, 106, 0, 0.08) !important;
-  box-shadow: 0 0 14px rgba(255, 106, 0, 0.45), inset 0 0 6px rgba(255, 106, 0, 0.25) !important;
+  border-color: var(--theme-accent-light, #FF6A00) !important;
+  background-color: var(--theme-accent-glow-subtle, rgba(255, 106, 0, 0.08)) !important;
+  box-shadow: 0 0 14px var(--theme-accent-glow, rgba(255, 106, 0, 0.45)), inset 0 0 6px var(--theme-accent-glow-subtle, rgba(255, 106, 0, 0.25)) !important;
 }
 
 .cursor-hovered .crosshair-indicator {
@@ -261,15 +272,15 @@ code, pre, .font-mono {
 .cursor-clicking {
   width: 22px !important;
   height: 22px !important;
-  border-color: #FF8C33 !important;
+  border-color: var(--theme-accent-light, #FF8C33) !important;
 }
 
 /* Mechanical Crosshairs Indicators */
 .crosshair-indicator {
   position: absolute;
-  background-color: #FF6A00;
+  background-color: var(--theme-accent-light, #FF6A00);
   opacity: 0;
-  transition: opacity 0.15s ease-out;
+  transition: opacity 0.15s ease-out, background-color 0.4s ease;
   pointer-events: none;
 }
 
@@ -319,6 +330,38 @@ code, pre, .font-mono {
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+@keyframes marqueeScrollReverse {
+  0% { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+.animate-marquee-reverse {
+  display: flex;
+  width: max-content;
+  animation: marqueeScrollReverse 36s linear infinite;
+}
+
+.animate-marquee-reverse:hover {
+  animation-play-state: paused;
+}
+
+@keyframes lightSweep {
+  0% { transform: translateX(-120%); }
+  40%, 100% { transform: translateX(220%); }
+}
+
+.light-sweep-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transform: skewX(-20deg);
+  animation: lightSweep 9s ease-in-out infinite;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -182,7 +182,10 @@ export const CustomCursor: React.FC = () => {
       {/* 1. Thin Metallic Outer Targeting Ring */}
       <div
         ref={ringRef}
-        className="fixed top-0 left-0 w-7 h-7 rounded-full border border-[#8E8E93]/80 shadow-[0_0_8px_rgba(255,106,0,0.2)] will-change-transform flex items-center justify-center transition-[width,height,border-color,background-color,box-shadow] duration-150 ease-out"
+        className="fixed top-0 left-0 w-7 h-7 rounded-full border border-[#8E8E93]/80 will-change-transform flex items-center justify-center transition-[width,height,border-color,background-color,box-shadow] duration-150 ease-out"
+        style={{
+          boxShadow: '0 0 8px var(--theme-accent-glow, rgba(255,106,0,0.2))',
+        }}
       >
         {/* Subtle crosshairs appearing on hover via CSS */}
         <span className="crosshair-indicator crosshair-v-top" />
@@ -194,7 +197,12 @@ export const CustomCursor: React.FC = () => {
       {/* 2. Precision Center Core Dot (Instant 1:1 Track) */}
       <div
         ref={dotRef}
-        className="fixed top-0 left-0 w-2 h-2 rounded-full bg-[#FF6A00] shadow-[0_0_8px_#FF6A00] will-change-transform"
+        className="fixed top-0 left-0 w-2 h-2 rounded-full will-change-transform"
+        style={{
+          backgroundColor: 'var(--theme-accent-light, #FF6A00)',
+          boxShadow: '0 0 8px var(--theme-accent, #FF6A00)',
+          transition: 'background-color 0.4s ease, box-shadow 0.4s ease',
+        }}
       />
     </div>
   );

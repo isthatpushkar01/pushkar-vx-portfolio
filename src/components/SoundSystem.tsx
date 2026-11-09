@@ -63,43 +63,55 @@ export const SoundSystem: React.FC = () => {
     return () => clearInterval(interval);
   }, [isPlaying, isMuted]);
 
+  const activeTheme = currentTrack.theme;
+
   return (
     <div className="relative">
       {/* 1. COMPACT NAVBAR CONTROL BAR */}
-      <div className="flex items-center rounded-md bg-gradient-to-b from-[#1C1C24] via-[#14141B] to-[#0D0D12] border border-[#2E2E3C] hover:border-[#FF6A00]/70 shadow-[0_2px_0_#07070A,0_3px_6px_rgba(0,0,0,0.6)] p-0.5 select-none transition-all">
+      <div 
+        className="flex items-center rounded-md bg-gradient-to-b from-[#1C1C24] via-[#14141B] to-[#0D0D12] border border-[#2E2E3C] shadow-[0_2px_0_#07070A,0_3px_6px_rgba(0,0,0,0.6)] p-0.5 select-none transition-all duration-300"
+        style={{
+          borderColor: isPlaying ? 'var(--theme-accent, #2E2E3C)' : undefined,
+        }}
+      >
         {/* Play/Pause & Equalizer Trigger */}
         <button
           onClick={() => youtubeSoundSystem.togglePlay()}
-          className={`flex items-center gap-1.5 px-2 py-1 rounded font-mono text-[10px] font-bold tracking-wider uppercase transition-colors cursor-pointer ${
-            isPlaying && !isMuted ? 'text-[#FF6A00]' : 'text-[#8E8E93] hover:text-white'
-          }`}
+          className="flex items-center gap-1.5 px-2 py-1 rounded font-mono text-[10px] font-bold tracking-wider uppercase transition-colors cursor-pointer"
+          style={{
+            color: isPlaying && !isMuted ? 'var(--theme-accent-light, #FF6A00)' : '#8E8E93',
+          }}
           title={isPlaying ? 'Pause Music' : 'Play Selected YouTube Soundtrack'}
         >
-          {/* Animated Equalizer Waveform */}
+          {/* Animated Equalizer Waveform with Dynamic Theme Tones */}
           <div className="flex items-end gap-0.5 h-3.5 w-3.5 pb-0.5" aria-hidden="true">
             <span
-              className={`w-0.5 rounded-full transition-all duration-100 ${
-                isPlaying && !isMuted ? 'bg-[#FF6A00]' : 'bg-[#4B4B58]'
-              }`}
-              style={{ height: `${eqHeights[0]}px` }}
+              className="w-0.5 rounded-full transition-all duration-100"
+              style={{ 
+                height: `${eqHeights[0]}px`,
+                backgroundColor: isPlaying && !isMuted ? 'var(--theme-accent-light, #FF6A00)' : '#4B4B58',
+              }}
             />
             <span
-              className={`w-0.5 rounded-full transition-all duration-100 ${
-                isPlaying && !isMuted ? 'bg-[#FF8C33]' : 'bg-[#4B4B58]'
-              }`}
-              style={{ height: `${eqHeights[1]}px` }}
+              className="w-0.5 rounded-full transition-all duration-100"
+              style={{ 
+                height: `${eqHeights[1]}px`,
+                backgroundColor: isPlaying && !isMuted ? 'var(--theme-accent, #FF8C33)' : '#4B4B58',
+              }}
             />
             <span
-              className={`w-0.5 rounded-full transition-all duration-100 ${
-                isPlaying && !isMuted ? 'bg-[#FF6A00]' : 'bg-[#4B4B58]'
-              }`}
-              style={{ height: `${eqHeights[2]}px` }}
+              className="w-0.5 rounded-full transition-all duration-100"
+              style={{ 
+                height: `${eqHeights[2]}px`,
+                backgroundColor: isPlaying && !isMuted ? 'var(--theme-accent-light, #FF6A00)' : '#4B4B58',
+              }}
             />
             <span
-              className={`w-0.5 rounded-full transition-all duration-100 ${
-                isPlaying && !isMuted ? 'bg-[#F5B900]' : 'bg-[#4B4B58]'
-              }`}
-              style={{ height: `${eqHeights[3]}px` }}
+              className="w-0.5 rounded-full transition-all duration-100"
+              style={{ 
+                height: `${eqHeights[3]}px`,
+                backgroundColor: isPlaying && !isMuted ? 'var(--theme-accent-deep, #F5B900)' : '#4B4B58',
+              }}
             />
           </div>
 
@@ -134,16 +146,20 @@ export const SoundSystem: React.FC = () => {
           {isMuted || !isPlaying ? (
             <VolumeX className="w-3 h-3 text-[#71717A]" />
           ) : (
-            <Volume2 className="w-3 h-3 text-[#FF6A00]" />
+            <Volume2 
+              className="w-3 h-3" 
+              style={{ color: 'var(--theme-accent-light, #FF6A00)' }} 
+            />
           )}
         </button>
 
         {/* Expand Playlist Popover Button */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className={`p-1 rounded transition-colors cursor-pointer ${
-            isExpanded ? 'text-[#FF6A00]' : 'text-[#8E8E93] hover:text-white'
-          }`}
+          className="p-1 rounded transition-colors cursor-pointer"
+          style={{
+            color: isExpanded ? 'var(--theme-accent-light, #FF6A00)' : '#8E8E93',
+          }}
           title="Open PUSHKAR.VX // SOUND SYSTEM Console"
         >
           <ListMusic className="w-3.5 h-3.5" />
@@ -152,11 +168,23 @@ export const SoundSystem: React.FC = () => {
 
       {/* 2. EXPANDABLE FUTURISTIC MUSIC PLAYER CONSOLE */}
       {isExpanded && (
-        <div className="absolute top-full right-0 mt-2.5 w-[330px] sm:w-[360px] rounded-2xl bg-[#0C0C12] border-2 border-[#262634] shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_25px_rgba(255,106,0,0.15)] z-[60] overflow-hidden backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-150">
+        <div 
+          className="absolute top-full right-0 mt-2.5 w-[330px] sm:w-[360px] rounded-2xl bg-[#0C0C12] border-2 border-[#262634] z-[60] overflow-hidden backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-150 transition-shadow duration-300"
+          style={{
+            boxShadow: `0 20px 50px rgba(0,0,0,0.95), 0 0 25px var(--theme-accent-glow-subtle, rgba(255,106,0,0.15))`,
+            borderColor: 'var(--theme-accent, #262634)',
+          }}
+        >
           {/* Header */}
           <div className="flex items-center justify-between px-3.5 py-2.5 bg-gradient-to-r from-[#161622] via-[#101016] to-[#161622] border-b border-[#242432]">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#FF6A00] animate-ping shadow-[0_0_8px_#FF6A00]" />
+              <span 
+                className="w-2 h-2 rounded-full animate-ping"
+                style={{ 
+                  backgroundColor: 'var(--theme-accent-light, #FF6A00)',
+                  boxShadow: '0 0 8px var(--theme-accent-light, #FF6A00)',
+                }}
+              />
               <span className="text-[10px] font-mono font-black tracking-widest text-white uppercase">
                 PUSHKAR.VX // SOUND SYSTEM
               </span>
@@ -173,7 +201,12 @@ export const SoundSystem: React.FC = () => {
           {/* Current Track Display */}
           <div className="p-3.5 bg-[#09090E] border-b border-[#1E1E28]">
             <div className="flex items-center justify-between text-[9px] font-mono text-[#8E8E93] mb-1">
-              <span className="text-[#FF6A00] font-bold">{currentTrack.tag}</span>
+              <span 
+                className="font-bold tracking-wider"
+                style={{ color: 'var(--theme-accent-light, #FF6A00)' }}
+              >
+                {currentTrack.tag}
+              </span>
               <span className="flex items-center gap-1 text-[#A6E635]">
                 <Radio className="w-2.5 h-2.5 animate-pulse" />
                 <span>OFFICIAL YOUTUBE STREAM</span>
@@ -190,14 +223,17 @@ export const SoundSystem: React.FC = () => {
                 </p>
               </div>
 
-              {/* Spinning Disc Indicator */}
+              {/* Spinning Disc Indicator with Dynamic Theme Accent */}
               <div
                 className={`w-9 h-9 rounded-full bg-gradient-to-br from-[#1F1F2C] to-[#111116] border border-[#353545] flex items-center justify-center shrink-0 shadow-md ${
                   isPlaying && !isMuted ? 'animate-spin' : ''
                 }`}
                 style={{ animationDuration: '4s' }}
               >
-                <Disc3 className="w-5 h-5 text-[#FF6A00]" />
+                <Disc3 
+                  className="w-5 h-5 transition-colors duration-300"
+                  style={{ color: 'var(--theme-accent-light, #FF6A00)' }} 
+                />
               </div>
             </div>
 
@@ -233,19 +269,24 @@ export const SoundSystem: React.FC = () => {
                 <SkipBack className="w-3.5 h-3.5" />
               </button>
 
-              {/* Play / Pause */}
+              {/* Play / Pause with dynamic theme gradient button */}
               <button
                 onClick={() => youtubeSoundSystem.togglePlay()}
-                className="px-4 py-2 rounded-lg bg-gradient-to-b from-[#FF7A1A] to-[#E05500] hover:from-[#FF8C33] hover:to-[#EB6000] text-black font-mono font-black text-xs uppercase transition-all shadow-[0_2px_10px_rgba(255,106,0,0.4)] active:translate-y-0.5 cursor-pointer flex items-center gap-1.5"
+                className="px-4 py-2 rounded-lg text-white font-mono font-black text-xs uppercase transition-all active:translate-y-0.5 cursor-pointer flex items-center gap-1.5"
+                style={{
+                  background: activeTheme.buttonGradient,
+                  boxShadow: activeTheme.buttonShadow,
+                  color: activeTheme.badgeText === '#000000' ? '#000000' : '#FFFFFF',
+                }}
               >
                 {isPlaying ? (
                   <>
-                    <Pause className="w-3.5 h-3.5 fill-black" />
+                    <Pause className={`w-3.5 h-3.5 ${activeTheme.badgeText === '#000000' ? 'fill-black' : 'fill-white'}`} />
                     <span>PAUSE</span>
                   </>
                 ) : (
                   <>
-                    <Play className="w-3.5 h-3.5 fill-black" />
+                    <Play className={`w-3.5 h-3.5 ${activeTheme.badgeText === '#000000' ? 'fill-black' : 'fill-white'}`} />
                     <span>PLAY</span>
                   </>
                 )}
@@ -263,11 +304,12 @@ export const SoundSystem: React.FC = () => {
               {/* Auto Playlist Loop Toggle */}
               <button
                 onClick={() => youtubeSoundSystem.togglePlaylistMode()}
-                className={`p-2 rounded-lg border transition-colors cursor-pointer ${
-                  playlistMode
-                    ? 'bg-[#1F1812] border-[#FF6A00] text-[#FF6A00]'
-                    : 'bg-[#181822] border-[#2B2B3A] text-[#71717A] hover:text-white'
-                }`}
+                className="p-2 rounded-lg border transition-colors cursor-pointer"
+                style={{
+                  borderColor: playlistMode ? 'var(--theme-accent, #FF6A00)' : '#2B2B3A',
+                  color: playlistMode ? 'var(--theme-accent-light, #FF6A00)' : '#71717A',
+                  backgroundColor: playlistMode ? 'var(--theme-bg-ambient, #1F1812)' : '#181822',
+                }}
                 title={playlistMode ? 'Continuous Playlist: ACTIVE' : 'Continuous Playlist: OFF'}
               >
                 <Repeat className="w-3.5 h-3.5" />
@@ -283,7 +325,10 @@ export const SoundSystem: React.FC = () => {
                 {isMuted || volume === 0 ? (
                   <VolumeX className="w-3.5 h-3.5 text-[#71717A]" />
                 ) : (
-                  <Volume2 className="w-3.5 h-3.5 text-[#FF6A00]" />
+                  <Volume2 
+                    className="w-3.5 h-3.5"
+                    style={{ color: 'var(--theme-accent-light, #FF6A00)' }} 
+                  />
                 )}
               </button>
               <input
@@ -293,7 +338,8 @@ export const SoundSystem: React.FC = () => {
                 step="5"
                 value={isMuted ? 0 : volume}
                 onChange={(e) => youtubeSoundSystem.setVolume(parseFloat(e.target.value))}
-                className="w-16 accent-[#FF6A00] h-1 bg-[#22222E] rounded-lg cursor-pointer"
+                className="w-16 h-1 bg-[#22222E] rounded-lg cursor-pointer"
+                style={{ accentColor: 'var(--theme-accent-light, #FF6A00)' }}
               />
             </div>
           </div>
@@ -310,27 +356,29 @@ export const SoundSystem: React.FC = () => {
                 <button
                   key={t.id}
                   onClick={() => youtubeSoundSystem.selectTrack(idx)}
-                  className={`w-full flex items-center justify-between p-2 rounded-xl text-left transition-all cursor-pointer border ${
-                    isSelected
-                      ? 'bg-gradient-to-r from-[#221B14] to-[#17130F] border-[#FF6A00] shadow-[0_0_10px_rgba(255,106,0,0.2)]'
-                      : 'bg-[#121218] hover:bg-[#181822] border-[#22222C] text-[#D4D4D8]'
-                  }`}
+                  className="w-full flex items-center justify-between p-2 rounded-xl text-left transition-all duration-200 cursor-pointer border"
+                  style={{
+                    borderColor: isSelected ? 'var(--theme-accent, #FF6A00)' : '#22222C',
+                    backgroundColor: isSelected ? 'rgba(20, 20, 28, 0.95)' : '#121218',
+                    boxShadow: isSelected ? `0 0 12px ${t.theme.accentGlowSubtle}` : undefined,
+                  }}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span
-                      className={`w-5 h-5 rounded-md flex items-center justify-center font-mono text-[10px] font-bold ${
-                        isSelected
-                          ? 'bg-[#FF6A00] text-black font-black'
-                          : 'bg-[#1C1C26] text-[#8E8E93]'
-                      }`}
+                      className="w-5 h-5 rounded-md flex items-center justify-center font-mono text-[10px] font-bold transition-colors duration-200"
+                      style={{
+                        backgroundColor: isSelected ? t.theme.badgeBg : '#1C1C26',
+                        color: isSelected ? t.theme.badgeText : '#8E8E93',
+                      }}
                     >
                       {idx + 1}
                     </span>
                     <div className="min-w-0">
                       <p
-                        className={`text-xs font-display font-bold truncate ${
-                          isSelected ? 'text-[#FF6A00]' : 'text-white'
-                        }`}
+                        className="text-xs font-display font-bold truncate transition-colors duration-200"
+                        style={{
+                          color: isSelected ? 'var(--theme-accent-light, #FF6A00)' : '#FFFFFF',
+                        }}
                       >
                         {t.title}
                       </p>
@@ -339,7 +387,13 @@ export const SoundSystem: React.FC = () => {
                   </div>
 
                   {isSelected && isPlaying && !isMuted ? (
-                    <span className="w-2 h-2 rounded-full bg-[#A6E635] animate-pulse shrink-0" />
+                    <span 
+                      className="w-2 h-2 rounded-full animate-pulse shrink-0" 
+                      style={{
+                        backgroundColor: 'var(--theme-accent-light, #A6E635)',
+                        boxShadow: '0 0 6px var(--theme-accent-light, #A6E635)',
+                      }}
+                    />
                   ) : (
                     <span className="text-[10px] font-mono text-[#71717A] uppercase shrink-0">
                       {idx === 0 ? '01' : idx === 1 ? '02' : '03'}
@@ -350,19 +404,33 @@ export const SoundSystem: React.FC = () => {
             })}
           </div>
 
-          {/* Footer note */}
+          {/* Footer note with theme indicator */}
           <div className="px-3 py-2 bg-[#08080C] border-t border-[#1C1C24] flex items-center justify-between text-[9px] font-mono text-[#55555E]">
-            <span>OFFICIAL YOUTUBE AUDIO</span>
+            <span className="flex items-center gap-1.5">
+              <span 
+                className="w-1.5 h-1.5 rounded-full inline-block"
+                style={{ backgroundColor: 'var(--theme-accent-light, #FF6A00)' }}
+              />
+              <span className="text-[#8E8E93]">{activeTheme.name}</span>
+            </span>
             <a
               href={currentTrack.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#8E8E93] hover:text-[#FF6A00] flex items-center gap-1 transition-colors"
+              className="text-[#8E8E93] hover:text-white flex items-center gap-1 transition-colors"
             >
               <span>Watch on YouTube</span>
               <ExternalLink className="w-2.5 h-2.5" />
             </a>
           </div>
+
+          {/* Bottom Theme Accent Line */}
+          <div 
+            className="h-1 w-full transition-all duration-500"
+            style={{
+              background: `linear-gradient(to right, transparent, var(--theme-accent, #FF6A00), transparent)`,
+            }}
+          />
         </div>
       )}
     </div>

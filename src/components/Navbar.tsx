@@ -112,7 +112,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume }) => {
           onClick={() => handleNavClick('hero', 'console')}
           className="flex items-center gap-2.5 group shrink-0"
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF6A00] to-[#F5B900] flex items-center justify-center font-display font-black text-black text-xs shadow-[0_0_12px_rgba(255,106,0,0.5)] group-hover:scale-105 transition-transform">
+          <div 
+            className="w-8 h-8 rounded-lg flex items-center justify-center font-display font-black text-black text-xs group-hover:scale-105 transition-all duration-300"
+            style={{
+              background: 'linear-gradient(to bottom right, var(--theme-accent-light, #FF6A00), var(--theme-accent, #F5B900))',
+              boxShadow: '0 0 12px var(--theme-accent-glow, rgba(255,106,0,0.5))',
+            }}
+          >
             VX
           </div>
           <div className="hidden sm:block">
@@ -136,26 +142,44 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume }) => {
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.targetId, item.id)}
-                className={`group relative px-2.5 py-1.5 rounded-md font-mono text-[10px] xl:text-[11px] font-bold tracking-wider uppercase transition-all duration-100 cursor-pointer select-none flex items-center gap-1.5 ${
+                className={`group relative px-2.5 py-1.5 rounded-md font-mono text-[10px] xl:text-[11px] font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer select-none flex items-center gap-1.5 ${
                   isActive
-                    ? 'bg-gradient-to-b from-[#252532] to-[#14141B] text-[#FF6A00] border border-[#FF6A00] shadow-[0_0_12px_rgba(255,106,0,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] translate-y-0.5'
-                    : 'bg-gradient-to-b from-[#1E1E26] via-[#16161D] to-[#0F0F14] text-[#C4C4C8] hover:text-white border border-[#32323E] hover:border-[#FF6A00]/70 shadow-[0_2.5px_0_#09090C,0_4px_6px_rgba(0,0,0,0.5)] hover:-translate-y-0.5 hover:shadow-[0_4px_0_#09090C,0_0_12px_rgba(255,106,0,0.25)]'
-                } ${isPressed ? 'translate-y-1 shadow-[0_0_0_#09090C,inset_0_2px_4px_rgba(0,0,0,0.6)] !border-[#FF6A00]' : ''}`}
+                    ? 'bg-gradient-to-b from-[#252532] to-[#14141B] translate-y-0.5'
+                    : 'bg-gradient-to-b from-[#1E1E26] via-[#16161D] to-[#0F0F14] text-[#C4C4C8] hover:text-white border border-[#32323E] shadow-[0_2.5px_0_#09090C,0_4px_6px_rgba(0,0,0,0.5)] hover:-translate-y-0.5'
+                } ${isPressed ? 'translate-y-1 shadow-[0_0_0_#09090C,inset_0_2px_4px_rgba(0,0,0,0.6)]' : ''}`}
                 style={{
-                  textShadow: isActive ? '0 0 8px rgba(255, 106, 0, 0.4)' : undefined,
+                  color: isActive ? 'var(--theme-accent-light, #FF6A00)' : undefined,
+                  borderColor: isActive ? 'var(--theme-accent, #FF6A00)' : undefined,
+                  borderWidth: isActive ? '1px' : undefined,
+                  boxShadow: isActive
+                    ? '0 0 12px var(--theme-accent-glow, rgba(255,106,0,0.3)), inset 0 1px 0 rgba(255,255,255,0.2)'
+                    : undefined,
+                  textShadow: isActive ? '0 0 8px var(--theme-accent-glow, rgba(255, 106, 0, 0.4))' : undefined,
                 }}
                 title={`Navigate to ${item.label}`}
               >
                 {/* Active Indicator LED */}
                 {isActive && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#FF6A00] animate-pulse shadow-[0_0_6px_#FF6A00] shrink-0" />
+                  <span 
+                    className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0" 
+                    style={{
+                      backgroundColor: 'var(--theme-accent-light, #FF6A00)',
+                      boxShadow: '0 0 6px var(--theme-accent-light, #FF6A00)',
+                    }}
+                  />
                 )}
 
                 <span>{item.label}</span>
 
                 {/* Bottom Active Glow Bar */}
                 {isActive && (
-                  <span className="absolute bottom-0 left-1 right-1 h-0.5 bg-[#FF6A00] rounded-full shadow-[0_0_6px_#FF6A00]" />
+                  <span 
+                    className="absolute bottom-0 left-1 right-1 h-0.5 rounded-full" 
+                    style={{
+                      backgroundColor: 'var(--theme-accent, #FF6A00)',
+                      boxShadow: '0 0 6px var(--theme-accent, #FF6A00)',
+                    }}
+                  />
                 )}
               </button>
             );
@@ -182,19 +206,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume }) => {
           <a
             href="#contact"
             onClick={() => handleNavClick('contact', 'contact')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gradient-to-b from-[#FF7A1A] to-[#E05500] hover:from-[#FF8C33] hover:to-[#EB6000] text-black text-[11px] font-mono font-black tracking-wider uppercase shadow-[0_2.5px_0_#803000,0_4px_10px_rgba(255,106,0,0.4)] hover:-translate-y-0.5 transition-all active:translate-y-0.5 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-white text-[11px] font-mono font-black tracking-wider uppercase shadow-[0_2.5px_0_#09090C] hover:-translate-y-0.5 transition-all active:translate-y-0.5 cursor-pointer"
+            style={{
+              background: 'linear-gradient(to bottom, var(--theme-accent-light, #FF7A1A), var(--theme-accent, #E05500))',
+              boxShadow: '0 2.5px 0 #09090C, 0 4px 10px var(--theme-accent-glow, rgba(255,106,0,0.4))',
+            }}
           >
-            <Send className="w-3 h-3 text-black stroke-[3]" />
+            <Send className="w-3 h-3 text-white stroke-[3]" />
             <span>CONNECT</span>
           </a>
 
           {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-md bg-[#16161D] border border-[#30303C] text-white hover:text-[#FF6A00] transition-colors cursor-pointer"
+            className="lg:hidden p-2 rounded-md bg-[#16161D] border border-[#30303C] text-white hover:text-[var(--theme-accent-light,#FF6A00)] transition-colors cursor-pointer"
             aria-label="Toggle mobile navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5 text-[#FF6A00]" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-5 h-5 text-[var(--theme-accent-light,#FF6A00)]" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
@@ -211,12 +239,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume }) => {
                   onClick={() => handleNavClick(item.targetId, item.id)}
                   className={`p-2.5 rounded-md font-mono text-xs font-bold tracking-wider uppercase text-left flex items-center justify-between transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-[#1E1E28] text-[#FF6A00] border border-[#FF6A00] shadow-[0_0_10px_rgba(255,106,0,0.25)]'
+                      ? 'bg-[#1E1E28]'
                       : 'bg-[#121217] text-[#C4C4C8] hover:text-white border border-[#2B2B36]'
                   }`}
+                  style={{
+                    color: isActive ? 'var(--theme-accent-light, #FF6A00)' : undefined,
+                    borderColor: isActive ? 'var(--theme-accent, #FF6A00)' : undefined,
+                    borderWidth: isActive ? '1px' : undefined,
+                    boxShadow: isActive ? '0 0 10px var(--theme-accent-glow-subtle)' : undefined,
+                  }}
                 >
                   <span>{item.label}</span>
-                  {isActive && <span className="w-2 h-2 rounded-full bg-[#FF6A00] animate-pulse" />}
+                  {isActive && (
+                    <span 
+                      className="w-2 h-2 rounded-full animate-pulse" 
+                      style={{ backgroundColor: 'var(--theme-accent-light, #FF6A00)' }}
+                    />
+                  )}
                 </button>
               );
             })}

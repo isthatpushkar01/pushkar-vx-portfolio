@@ -5,6 +5,23 @@
  * zero audio extraction or downloading.
  */
 
+export interface TrackTheme {
+  id: string;
+  name: string;
+  primaryAccent: string;     // Base color (#FF6A00, #3C0061, #5A262C)
+  accentLight: string;       // High-contrast readable tone against black
+  accentDeep: string;        // Deep accent shade
+  accentGlow: string;        // Box-shadow glow
+  accentGlowSubtle: string;  // Ambient subtle glow
+  bgAmbient: string;         // Spotlight overlay & backdrop ambient
+  selectionBg: string;       // Browser selection background
+  buttonGradient: string;    // Gradient for primary buttons
+  buttonHoverGradient: string;
+  buttonShadow: string;
+  badgeBg: string;
+  badgeText: string;
+}
+
 export interface Track {
   id: string;
   videoId: string;
@@ -12,6 +29,7 @@ export interface Track {
   artist: string;
   tag: string;
   url: string;
+  theme: TrackTheme;
 }
 
 export const TRACKS: Track[] = [
@@ -20,24 +38,76 @@ export const TRACKS: Track[] = [
     videoId: 'LGLS4ARe-vw',
     title: 'Loser (Theatre Version)',
     artist: 'Tame Impala',
-    tag: 'TRACK 01 // PSYCH SYNTH',
+    tag: 'TRACK 01 // ORANGE THEME',
     url: 'https://youtu.be/LGLS4ARe-vw?si=u5_f5cY2a47efHN9',
+    theme: {
+      id: 'orange',
+      name: 'CYBER ORANGE',
+      primaryAccent: '#FF6A00',
+      accentLight: '#FF8A32',
+      accentDeep: '#D45500',
+      accentGlow: 'rgba(255, 106, 0, 0.45)',
+      accentGlowSubtle: 'rgba(255, 106, 0, 0.16)',
+      bgAmbient: 'rgba(255, 106, 0, 0.05)',
+      selectionBg: 'rgba(255, 106, 0, 0.3)',
+      buttonGradient: 'linear-gradient(to bottom, #FF7A1A, #E05500)',
+      buttonHoverGradient: 'linear-gradient(to bottom, #FF8C33, #EB6000)',
+      buttonShadow: '0 6px 20px rgba(255, 106, 0, 0.4)',
+      badgeBg: '#FF6A00',
+      badgeText: '#000000',
+    },
   },
   {
     id: 'track-2',
     videoId: 'LiXIoqGXfh8',
     title: 'Timeless (Instrumental)',
     artist: 'The Weeknd',
-    tag: 'TRACK 02 // DARK AMBIENT',
+    tag: 'TRACK 02 // PURPLE THEME',
     url: 'https://youtu.be/LiXIoqGXfh8?si=RciHNT_HlSCtFwzx',
+    theme: {
+      id: 'purple',
+      name: 'DEEP PURPLE',
+      // Strict exact primary accent: #3C0061
+      primaryAccent: '#3C0061',
+      // High-contrast luminous purple for readable text/borders on pure black
+      accentLight: '#A855F7',
+      accentDeep: '#26003E',
+      accentGlow: 'rgba(168, 85, 247, 0.45)',
+      accentGlowSubtle: 'rgba(60, 0, 97, 0.35)',
+      bgAmbient: 'rgba(140, 30, 220, 0.07)',
+      selectionBg: 'rgba(168, 85, 247, 0.3)',
+      buttonGradient: 'linear-gradient(to bottom, #A855F7, #3C0061)',
+      buttonHoverGradient: 'linear-gradient(to bottom, #C084FC, #4F0080)',
+      buttonShadow: '0 6px 20px rgba(168, 85, 247, 0.35)',
+      badgeBg: '#A855F7',
+      badgeText: '#FFFFFF',
+    },
   },
   {
     id: 'track-3',
     videoId: '07fhkAoCnig',
     title: 'The Color Violet',
     artist: 'Tory Lanez',
-    tag: 'TRACK 03 // RETRO SYNTH',
+    tag: 'TRACK 03 // BURGUNDY THEME',
     url: 'https://youtu.be/07fhkAoCnig?si=QiePSxTXdKVUNxhM',
+    theme: {
+      id: 'burgundy',
+      name: 'DEEP BURGUNDY',
+      // Strict exact primary accent: #5A262C
+      primaryAccent: '#5A262C',
+      // High-contrast luminous burgundy-rose for readable text/borders on pure black
+      accentLight: '#C04A55',
+      accentDeep: '#3B181C',
+      accentGlow: 'rgba(192, 74, 85, 0.45)',
+      accentGlowSubtle: 'rgba(90, 38, 44, 0.35)',
+      bgAmbient: 'rgba(192, 74, 85, 0.07)',
+      selectionBg: 'rgba(192, 74, 85, 0.3)',
+      buttonGradient: 'linear-gradient(to bottom, #C04A55, #5A262C)',
+      buttonHoverGradient: 'linear-gradient(to bottom, #E05A65, #732F37)',
+      buttonShadow: '0 6px 20px rgba(192, 74, 85, 0.35)',
+      badgeBg: '#C04A55',
+      badgeText: '#FFFFFF',
+    },
   },
 ];
 
@@ -84,9 +154,29 @@ export interface YTPlayerInstance {
   destroy: () => void;
 }
 
+/**
+ * Apply dynamic CSS custom properties corresponding to the chosen track theme.
+ */
+export function applyTrackTheme(trackIndex: number): void {
+  if (typeof document === 'undefined') return;
+  const track = TRACKS[trackIndex] || TRACKS[0];
+  const theme = track.theme;
+  const root = document.documentElement;
+
+  root.style.setProperty('--theme-accent', theme.primaryAccent);
+  root.style.setProperty('--theme-accent-light', theme.accentLight);
+  root.style.setProperty('--theme-accent-deep', theme.accentDeep);
+  root.style.setProperty('--theme-accent-glow', theme.accentGlow);
+  root.style.setProperty('--theme-accent-glow-subtle', theme.accentGlowSubtle);
+  root.style.setProperty('--theme-bg-ambient', theme.bgAmbient);
+  root.style.setProperty('--theme-selection', theme.selectionBg);
+  root.setAttribute('data-theme', theme.id);
+}
+
 class YouTubeSoundSystem {
   private player: YTPlayerInstance | null = null;
-  private currentTrackIndex: number = 0;
+  // Requirement 3: Random Track Selection on Every Visit with 1/3 equal probability
+  private currentTrackIndex: number = Math.floor(Math.random() * TRACKS.length);
   private isPlaying: boolean = false;
   private isMuted: boolean = false;
   private volume: number = 70;
@@ -95,6 +185,7 @@ class YouTubeSoundSystem {
   private playlistMode: boolean = true;
   private listeners: Set<() => void> = new Set();
   private pendingPlay: boolean = false;
+  private hasUserPaused: boolean = false;
 
   constructor() {
     try {
@@ -103,15 +194,12 @@ class YouTubeSoundSystem {
 
       const savedMute = sessionStorage.getItem('vx_yt_muted');
       if (savedMute !== null) this.isMuted = savedMute === 'true';
-
-      const savedTrack = sessionStorage.getItem('vx_yt_track');
-      if (savedTrack !== null) {
-        const idx = parseInt(savedTrack, 10);
-        if (idx >= 0 && idx < TRACKS.length) this.currentTrackIndex = idx;
-      }
     } catch {
       // Storage fallback
     }
+
+    // Apply the theme of the randomly selected track immediately
+    applyTrackTheme(this.currentTrackIndex);
   }
 
   public subscribe(listener: () => void): () => void {
@@ -129,6 +217,10 @@ class YouTubeSoundSystem {
 
   public getCurrentTrackIndex(): number {
     return this.currentTrackIndex;
+  }
+
+  public getCurrentTheme(): TrackTheme {
+    return TRACKS[this.currentTrackIndex].theme;
   }
 
   public getIsPlaying(): boolean {
@@ -159,6 +251,9 @@ class YouTubeSoundSystem {
   public initPlayer(containerId: string): void {
     if (this.player || typeof window === 'undefined') return;
 
+    // Apply active theme immediately on player initialization
+    applyTrackTheme(this.currentTrackIndex);
+
     const onScriptLoaded = () => {
       if (!window.YT || !window.YT.Player) return;
 
@@ -179,6 +274,14 @@ class YouTubeSoundSystem {
             this.isReady = true;
             event.target.setVolume(this.volume);
             if (this.isMuted) event.target.mute();
+
+            // Attempt non-blocking autoplay on initial load
+            try {
+              event.target.playVideo();
+            } catch {
+              // Browser policy will withhold playback until interaction; track is queued
+            }
+
             if (this.pendingPlay) {
               this.pendingPlay = false;
               event.target.playVideo();
@@ -210,6 +313,19 @@ class YouTubeSoundSystem {
       });
     };
 
+    // Listen for subtle first user interaction to unlock audible playback smoothly
+    const handleFirstUserInteraction = () => {
+      if (this.player && this.isReady && !this.isPlaying && !this.hasUserPaused) {
+        try {
+          this.player.playVideo();
+        } catch {
+          // Ignore
+        }
+      }
+    };
+    window.addEventListener('pointerdown', handleFirstUserInteraction, { once: true });
+    window.addEventListener('keydown', handleFirstUserInteraction, { once: true });
+
     if (window.YT && window.YT.Player) {
       onScriptLoaded();
     } else {
@@ -229,6 +345,7 @@ class YouTubeSoundSystem {
 
   public play(): void {
     this.hasError = false;
+    this.hasUserPaused = false;
     if (this.player && this.isReady) {
       this.player.playVideo();
       this.isPlaying = true;
@@ -239,6 +356,7 @@ class YouTubeSoundSystem {
   }
 
   public pause(): void {
+    this.hasUserPaused = true;
     if (this.player && this.isReady) {
       this.player.pauseVideo();
     }
@@ -259,11 +377,8 @@ class YouTubeSoundSystem {
     this.currentTrackIndex = index;
     this.hasError = false;
 
-    try {
-      sessionStorage.setItem('vx_yt_track', String(index));
-    } catch {
-      // Fallback
-    }
+    // Immediately activate the corresponding theme for the selected track
+    applyTrackTheme(index);
 
     if (this.player && this.isReady) {
       this.player.loadVideoById(TRACKS[index].videoId);
