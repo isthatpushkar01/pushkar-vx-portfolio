@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Terminal, ExternalLink, Github, Layers, Cpu, ArrowUpRight, CheckCircle2, Play, Activity } from 'lucide-react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
-import skillbridgeImg from '../assets/images/skillbridge_ai_preview_1794061672635.jpg';
-import agrisenseImg from '../assets/images/agrisense_ai_preview_1794061673877.jpg';
-import ghatshieldImg from '../assets/images/ghatshield_ai_preview_1794061673742.jpg';
+import skillbridgeImg from '../assets/images/skillbridge_preview.webp';
+import agrisenseImg from '../assets/images/agrisense_preview.webp';
+import ghatshieldImg from '../assets/images/ghatshield_preview.webp';
 
 export const Projects: React.FC = () => {
   const projects = PORTFOLIO_DATA.projects;
@@ -245,6 +245,10 @@ export const Projects: React.FC = () => {
                     <img
                       src={img}
                       alt={proj.title}
+                      loading="lazy"
+                      decoding="async"
+                      width={640}
+                      height={360}
                       className="w-full h-56 sm:h-64 object-cover filter brightness-95 group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ArrowDown, Sparkles, Terminal, FileText, Cpu, MapPin, Award, CheckCircle } from 'lucide-react';
 import { MechanicalConsole } from './MechanicalConsole';
 import { ThreeNeuralCore } from './ThreeNeuralCore';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
-import pushkarActualPortrait from '../assets/images/pushkar_actual_portrait.jpeg';
-import pushkarTransparentPortrait from '../assets/images/pushkar_portrait_transparent.png';
+import pushkarActualPortrait from '../assets/images/pushkar_actual_portrait.webp';
+import pushkarTransparentPortrait from '../assets/images/pushkar_portrait_transparent.webp';
 
 interface HeroProps {
   onOpenResume: () => void;
@@ -12,16 +12,18 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
   const p = PORTFOLIO_DATA.personal;
-  const [mouseParallax, setMouseParallax] = useState({ x: 0, y: 0 });
+  const portraitRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let frameId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
       if (frameId) return;
       frameId = requestAnimationFrame(() => {
-        const x = (e.clientX / window.innerWidth - 0.5) * 2;
-        const y = (e.clientY / window.innerHeight - 0.5) * 2;
-        setMouseParallax({ x, y });
+        if (portraitRef.current) {
+          const x = (e.clientX / window.innerWidth - 0.5) * -20;
+          const y = (e.clientY / window.innerHeight - 0.5) * -16;
+          portraitRef.current.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+        }
         frameId = null;
       });
     };
@@ -147,14 +149,16 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
             />
 
             <div 
-              className="relative w-[300px] sm:w-[370px] md:w-[420px] lg:w-[450px] xl:w-[490px] transition-transform duration-500 ease-out select-none animate-in fade-in duration-1000"
-              style={{
-                transform: `translate3d(${mouseParallax.x * -10}px, ${mouseParallax.y * -8}px, 0)`,
-              }}
+              ref={portraitRef}
+              className="relative w-[300px] sm:w-[370px] md:w-[420px] lg:w-[450px] xl:w-[490px] transition-transform duration-300 ease-out select-none will-change-transform"
             >
               <img
                 src={pushkarTransparentPortrait}
                 alt="Pushkar Vishwakarma - AI Engineer"
+                width={490}
+                height={550}
+                fetchPriority="high"
+                decoding="async"
                 className="w-full h-auto object-contain opacity-55 contrast-[1.03] brightness-[0.98] saturate-[1.02] drop-shadow-[0_20px_45px_rgba(0,0,0,0.95)] drop-shadow-[0_0_35px_rgba(255,106,0,0.15)]"
                 style={{
                   maskImage: `
@@ -213,6 +217,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
           <img
             src={pushkarActualPortrait}
             alt="Pushkar Vishwakarma"
+            width={48}
+            height={48}
+            loading="lazy"
+            decoding="async"
             className="w-12 h-12 rounded-xl object-cover object-top border border-[#3E3E48] shadow-md shrink-0"
           />
           <div className="text-left overflow-hidden">

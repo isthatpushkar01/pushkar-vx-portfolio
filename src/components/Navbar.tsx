@@ -60,28 +60,30 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume }) => {
     }
   };
 
-  // Scroll spy to highlight active section
+  // IntersectionObserver scroll spy to highlight active section with zero layout thrashing
   useEffect(() => {
-    const sectionIds = ['hero', 'journey', 'experience', 'projects', 'skills', 'explore', 'publications', 'certifications', 'contact'];
+    const sectionIds = ['hero', 'journey', 'experience', 'projects', 'skills', 'explore', 'achievements', 'certifications', 'contact'];
 
-    const handleScroll = () => {
-      const scrollY = window.scrollY + 180;
-      for (let i = sectionIds.length - 1; i >= 0; i--) {
-        const id = sectionIds[i];
-        const el = document.getElementById(id);
-        if (el) {
-          const top = el.offsetTop;
-          if (scrollY >= top) {
-            setActiveSection(id);
-            break;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
           }
-        }
+        });
+      },
+      {
+        rootMargin: '-15% 0px -65% 0px',
+        threshold: 0,
       }
-    };
+    );
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   const handleNavClick = (targetId: string, itemId: string) => {

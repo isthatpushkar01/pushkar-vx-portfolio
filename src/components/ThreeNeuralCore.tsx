@@ -133,7 +133,8 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     }
 
     // 6. Particle Cloud (Neural Dust / Synaptic points)
-    const particleCount = isSoftwareGl ? 120 : 380;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const particleCount = prefersReducedMotion ? 60 : (isSoftwareGl ? 100 : 200);
     const particleGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
@@ -218,10 +219,12 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
 
     window.addEventListener('resize', handleResize);
 
-    // Render loop
+    // Viewport-aware rendering loop (Pauses when off-screen or tab hidden)
     const clock = new THREE.Clock();
+    let isVisible = true;
 
     const animate = () => {
+      if (!isVisible) return;
       const delta = clock.getDelta();
       const elapsedTime = clock.getElapsedTime();
 
@@ -254,9 +257,33 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
       animationFrameId = requestAnimationFrame(animate);
     };
 
+    const observer = new IntersectionObserver(([entry]) => {
+      const wasVisible = isVisible;
+      isVisible = entry.isIntersecting && !document.hidden;
+      if (!wasVisible && isVisible) {
+        clock.start();
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    }, { threshold: 0.05 });
+    observer.observe(container);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isVisible = false;
+      } else {
+        isVisible = true;
+        clock.start();
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     animate();
 
     return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('mousemove', handlePointerMove);
       window.removeEventListener('portal-key-actuate', handleKeyActuation);

@@ -32,7 +32,7 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
   const [displayIndex, setDisplayIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const consoleRef = useRef<HTMLDivElement>(null);
-  const [mouseTilt, setMouseTilt] = useState({ x: 0, y: 0 });
+  const isVisibleRef = useRef<boolean>(true);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   // Typewriter phrases
@@ -266,10 +266,29 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
     },
   ];
 
-  // Typewriter loop
+  // Typewriter loop with IntersectionObserver pause
+  useEffect(() => {
+    const el = consoleRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisibleRef.current = entry.isIntersecting && !document.hidden;
+    }, { threshold: 0.1 });
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const currentPhrase = phrases[displayIndex];
     let timer: NodeJS.Timeout;
+
+    if (!isVisibleRef.current) {
+      timer = setTimeout(() => {
+        setDisplayIndex((prev) => (prev + 1) % phrases.length);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
 
     if (!isDeleting) {
       if (displayText.length < currentPhrase.length) {
@@ -351,17 +370,19 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [switchType, soundEnabled]);
 
-  // Subtle 3D mouse parallax on console
+  // Subtle 3D mouse parallax on console with direct DOM transform
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!consoleRef.current) return;
     const rect = consoleRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setMouseTilt({ x: x * 7, y: -y * 7 });
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 6;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -6;
+    consoleRef.current.style.transform = `perspective(1200px) rotateX(${y.toFixed(2)}deg) rotateY(${x.toFixed(2)}deg)`;
   };
 
   const handleMouseLeave = () => {
-    setMouseTilt({ x: 0, y: 0 });
+    if (consoleRef.current) {
+      consoleRef.current.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg)';
+    }
     setHoveredKey(null);
   };
 
@@ -379,10 +400,10 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{
-          transform: `perspective(1200px) rotateX(${mouseTilt.y}deg) rotateY(${mouseTilt.x}deg)`,
+          transform: 'perspective(1200px) rotateX(0deg) rotateY(0deg)',
           transition: 'transform 0.12s ease-out',
         }}
-        className="relative w-full max-w-4xl p-5 sm:p-8 rounded-[32px] sm:rounded-[38px] metallic-chassis-silver border border-[#FFFFFF]/40 transition-shadow duration-300"
+        className="relative w-full max-w-4xl p-5 sm:p-8 rounded-[32px] sm:rounded-[38px] metallic-chassis-silver border border-[#FFFFFF]/40 transition-shadow duration-300 will-change-transform"
       >
         {/* 4 Authentic Industrial Screws at Enclosure Corners */}
         <div className="absolute top-4 left-4 sm:top-5 sm:left-5">

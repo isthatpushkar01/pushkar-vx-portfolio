@@ -47,7 +47,16 @@ export const CustomCursor: React.FC = () => {
 
     if (!dotEl || !ringEl || !containerEl) return;
 
-    // Make visible on first mouse movement
+    let isLoopRunning = false;
+
+    const startRenderLoop = () => {
+      if (!isLoopRunning) {
+        isLoopRunning = true;
+        animFrameId = requestAnimationFrame(render);
+      }
+    };
+
+    // Make visible on first mouse movement & wake loop
     const onMouseMove = (e: MouseEvent) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
@@ -58,11 +67,14 @@ export const CustomCursor: React.FC = () => {
         ringY = mouseY;
         containerEl.style.opacity = '1';
       }
+
+      startRenderLoop();
     };
 
     const onMouseDown = () => {
       isClicking = true;
       ringEl.classList.add('cursor-clicking');
+      startRenderLoop();
     };
 
     const onMouseUp = () => {
@@ -78,6 +90,7 @@ export const CustomCursor: React.FC = () => {
     const onMouseEnter = () => {
       isVisible = true;
       containerEl.style.opacity = '1';
+      startRenderLoop();
     };
 
     // Event-delegated hover detection (only fires on element boundary crossings)
@@ -105,6 +118,7 @@ export const CustomCursor: React.FC = () => {
       if (isInteractive) {
         isHovered = true;
         ringEl.classList.add('cursor-hovered');
+        startRenderLoop();
       }
     };
 
@@ -119,12 +133,14 @@ export const CustomCursor: React.FC = () => {
       if (isInteractive) {
         isHovered = false;
         ringEl.classList.remove('cursor-hovered');
+        startRenderLoop();
       }
 
       const isText = target.closest('input, textarea, select, [contenteditable="true"]');
       if (isText) {
         isTextTarget = false;
         containerEl.style.opacity = '1';
+        startRenderLoop();
       }
     };
 
@@ -136,8 +152,7 @@ export const CustomCursor: React.FC = () => {
     window.addEventListener('pointerover', onPointerOver, { passive: true });
     window.addEventListener('pointerout', onPointerOut, { passive: true });
 
-    // Single requestAnimationFrame Render Loop
-    // Tight lerpFactor = 0.45 gives high-precision responsive tracking with zero perceived lag
+    // Single requestAnimationFrame Render Loop with Self-Sleeping
     const lerpFactor = prefersReducedMotion ? 1.0 : 0.45;
 
     const render = () => {
@@ -149,17 +164,27 @@ export const CustomCursor: React.FC = () => {
         ringX += (mouseX - ringX) * lerpFactor;
         ringY += (mouseY - ringY) * lerpFactor;
 
-        // Prevent micro-jitter when stationary
-        if (Math.abs(mouseX - ringX) < 0.1) ringX = mouseX;
-        if (Math.abs(mouseY - ringY) < 0.1) ringY = mouseY;
+        // Check if resting still
+        const dx = Math.abs(mouseX - ringX);
+        const dy = Math.abs(mouseY - ringY);
+
+        if (dx < 0.1 && dy < 0.1) {
+          ringX = mouseX;
+          ringY = mouseY;
+          ringEl.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+          // Sleep until next mouse movement
+          isLoopRunning = false;
+          return;
+        }
 
         ringEl.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+      } else {
+        isLoopRunning = false;
+        return;
       }
 
       animFrameId = requestAnimationFrame(render);
     };
-
-    animFrameId = requestAnimationFrame(render);
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove);

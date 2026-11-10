@@ -22,7 +22,6 @@ export const Certifications: React.FC = () => {
   const [selectedCert, setSelectedCert] = useState<Certification | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('ALL');
-  const [mousePos, setMousePos] = useState<Record<string, { x: number; y: number }>>({});
   const [isZoomed, setIsZoomed] = useState(false);
 
   const categories = [
@@ -62,16 +61,16 @@ export const Certifications: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedCert, certifications]);
 
-  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>, id: string) => {
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 16;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -16;
-    setMousePos((prev) => ({ ...prev, [id]: { x, y } }));
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -14;
+    e.currentTarget.style.transform = `perspective(1000px) rotateX(${y.toFixed(2)}deg) rotateY(${x.toFixed(2)}deg) translateY(-8px) scale(1.025)`;
   };
 
-  const handleCardMouseLeave = (id: string) => {
+  const handleCardMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
     setHoveredId(null);
-    setMousePos((prev) => ({ ...prev, [id]: { x: 0, y: 0 } }));
+    e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)';
   };
 
   const handlePrev = (e: React.MouseEvent) => {
@@ -169,7 +168,6 @@ export const Certifications: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
         {filteredCerts.map((cert) => {
           const isHovered = hoveredId === cert.id;
-          const tilt = mousePos[cert.id] || { x: 0, y: 0 };
           const hasSiblingHovered = hoveredId !== null && !isHovered;
 
           return (
@@ -177,16 +175,13 @@ export const Certifications: React.FC = () => {
               key={cert.id}
               onClick={() => setSelectedCert(cert)}
               onMouseEnter={() => setHoveredId(cert.id)}
-              onMouseMove={(e) => handleCardMouseMove(e, cert.id)}
-              onMouseLeave={() => handleCardMouseLeave(cert.id)}
-              className={`group relative rounded-2xl p-4 bg-[#0A0A0F] border transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden ${
+              onMouseMove={handleCardMouseMove}
+              onMouseLeave={handleCardMouseLeave}
+              className={`group relative rounded-2xl p-4 bg-[#0A0A0F] border transition-[opacity,border-color,box-shadow] duration-250 cursor-pointer flex flex-col justify-between overflow-hidden will-change-transform ${
                 hasSiblingHovered ? 'opacity-50 grayscale-[0.2]' : 'opacity-100'
               }`}
               style={{
                 borderColor: isHovered ? 'var(--theme-accent, #383848)' : '#20202B',
-                transform: isHovered
-                  ? `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg) translateY(-8px) scale(1.025)`
-                  : 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)',
                 boxShadow: isHovered
                   ? `0 24px 45px -10px rgba(0,0,0,0.9), 0 0 30px ${cert.brandColors.primary}33, 0 0 20px var(--theme-accent-glow-subtle)`
                   : '0 8px 24px -6px rgba(0,0,0,0.8)',
@@ -222,9 +217,12 @@ export const Certifications: React.FC = () => {
                 {/* Document Realistic Visual Preview with Original Aspect Ratio */}
                 <div className="relative rounded-xl overflow-hidden bg-[#060609] border border-[#1E1E28] mb-3.5 aspect-[1.414/1] shadow-inner group/img">
                   <img
-                    src={cert.image}
+                    src={cert.thumbnail || cert.image}
                     alt={cert.title}
                     loading="lazy"
+                    decoding="async"
+                    width={480}
+                    height={340}
                     className="w-full h-full object-contain p-1.5 transition-transform duration-500 ease-out group-hover:scale-105"
                   />
 

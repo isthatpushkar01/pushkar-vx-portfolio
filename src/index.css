@@ -365,10 +365,24 @@ code, pre, .font-mono {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
-    animation: none;
-    overflow-x: auto;
+  .animate-marquee,
+  .animate-marquee-reverse,
+  .light-sweep-overlay {
+    animation: none !important;
   }
+}
+
+/* Hardware-accelerated below-the-fold layout containment */
+#projects,
+#experience,
+#skills,
+#innovation,
+#explore,
+#achievements,
+#certifications,
+#beyond-tech {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 700px;
 }
 
 

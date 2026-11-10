@@ -248,16 +248,44 @@ class YouTubeSoundSystem {
     this.notify();
   }
 
+  private containerId: string = 'yt-embedded-soundtrack-player';
+  private isScriptLoading: boolean = false;
+
   public initPlayer(containerId: string): void {
     if (this.player || typeof window === 'undefined') return;
+    this.containerId = containerId;
 
-    // Apply active theme immediately on player initialization
+    // Apply active theme immediately on initial load
     applyTrackTheme(this.currentTrackIndex);
+
+    // Defer YouTube iframe API script loading to idle time or first interaction
+    const scheduleInit = () => {
+      if ('requestIdleCallback' in window) {
+        (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void }).requestIdleCallback(
+          () => this.loadApiAndCreatePlayer(),
+          { timeout: 3500 }
+        );
+      } else {
+        setTimeout(() => this.loadApiAndCreatePlayer(), 2500);
+      }
+    };
+
+    if (document.readyState === 'complete') {
+      scheduleInit();
+    } else {
+      window.addEventListener('load', scheduleInit, { once: true });
+    }
+  }
+
+  private loadApiAndCreatePlayer(): void {
+    if (this.player || this.isScriptLoading || typeof window === 'undefined') return;
+    this.isScriptLoading = true;
 
     const onScriptLoaded = () => {
       if (!window.YT || !window.YT.Player) return;
+      if (this.player) return;
 
-      this.player = new window.YT.Player(containerId, {
+      this.player = new window.YT.Player(this.containerId, {
         videoId: TRACKS[this.currentTrackIndex].videoId,
         playerVars: {
           autoplay: 0,
@@ -272,15 +300,9 @@ class YouTubeSoundSystem {
         events: {
           onReady: (event) => {
             this.isReady = true;
+            this.isScriptLoading = false;
             event.target.setVolume(this.volume);
             if (this.isMuted) event.target.mute();
-
-            // Attempt non-blocking autoplay on initial load
-            try {
-              event.target.playVideo();
-            } catch {
-              // Browser policy will withhold playback until interaction; track is queued
-            }
 
             if (this.pendingPlay) {
               this.pendingPlay = false;
@@ -307,24 +329,12 @@ class YouTubeSoundSystem {
           onError: () => {
             this.hasError = true;
             this.isPlaying = false;
+            this.isScriptLoading = false;
             this.notify();
           },
         },
       });
     };
-
-    // Listen for subtle first user interaction to unlock audible playback smoothly
-    const handleFirstUserInteraction = () => {
-      if (this.player && this.isReady && !this.isPlaying && !this.hasUserPaused) {
-        try {
-          this.player.playVideo();
-        } catch {
-          // Ignore
-        }
-      }
-    };
-    window.addEventListener('pointerdown', handleFirstUserInteraction, { once: true });
-    window.addEventListener('keydown', handleFirstUserInteraction, { once: true });
 
     if (window.YT && window.YT.Player) {
       onScriptLoaded();
@@ -334,8 +344,9 @@ class YouTubeSoundSystem {
         const tag = document.createElement('script');
         tag.id = 'youtube-iframe-api';
         tag.src = 'https://www.youtube.com/iframe_api';
+        tag.async = true;
         const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
+        firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
       }
       window.onYouTubeIframeAPIReady = () => {
         onScriptLoaded();
@@ -351,6 +362,7 @@ class YouTubeSoundSystem {
       this.isPlaying = true;
     } else {
       this.pendingPlay = true;
+      this.loadApiAndCreatePlayer();
     }
     this.notify();
   }
@@ -385,6 +397,7 @@ class YouTubeSoundSystem {
       this.isPlaying = true;
     } else {
       this.pendingPlay = true;
+      this.loadApiAndCreatePlayer();
     }
     this.notify();
   }

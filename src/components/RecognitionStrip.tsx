@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface RecognitionItem {
   id: string;
@@ -8,6 +8,23 @@ interface RecognitionItem {
 }
 
 export const RecognitionStrip: React.FC = () => {
+  const stripRef = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(true);
+
+  useEffect(() => {
+    const el = stripRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   const recognitions: RecognitionItem[] = [
     {
       id: 'gsa',
@@ -149,6 +166,7 @@ export const RecognitionStrip: React.FC = () => {
 
   return (
     <div 
+      ref={stripRef}
       aria-label="Achievements and Recognition Brand Strip"
       className="relative z-50 w-full bg-[#070709] border-b border-[#1E1E26] shadow-md flex items-center overflow-hidden select-none h-10 sm:h-11"
     >
@@ -171,7 +189,10 @@ export const RecognitionStrip: React.FC = () => {
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#070709] to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#070709] to-transparent z-10 pointer-events-none" />
 
-        <div className="animate-marquee flex items-center gap-6 sm:gap-8 px-4">
+        <div 
+          className="animate-marquee flex items-center gap-6 sm:gap-8 px-4"
+          style={{ animationPlayState: isInView ? 'running' : 'paused' }}
+        >
           {marqueeItems.map((item, index) => (
             <div
               key={`${item.id}-${index}`}

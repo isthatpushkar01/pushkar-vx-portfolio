@@ -25,7 +25,6 @@ export const SoundSystem: React.FC = () => {
   const [hasError, setHasError] = useState(youtubeSoundSystem.getHasError());
   const [playlistMode, setPlaylistMode] = useState(youtubeSoundSystem.getPlaylistMode());
   const [isExpanded, setIsExpanded] = useState(false);
-  const [eqHeights, setEqHeights] = useState([3, 5, 8, 4]);
 
   useEffect(() => {
     // Initialize YouTube player in the persistent DOM node
@@ -43,25 +42,6 @@ export const SoundSystem: React.FC = () => {
 
     return unsubscribe;
   }, []);
-
-  // Animated equalizer when playing
-  useEffect(() => {
-    if (!isPlaying || isMuted) {
-      setEqHeights([3, 3, 3, 3]);
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setEqHeights([
-        Math.floor(Math.random() * 11) + 3,
-        Math.floor(Math.random() * 13) + 3,
-        Math.floor(Math.random() * 12) + 3,
-        Math.floor(Math.random() * 10) + 3,
-      ]);
-    }, 120);
-
-    return () => clearInterval(interval);
-  }, [isPlaying, isMuted]);
 
   const activeTheme = currentTrack.theme;
 
@@ -86,31 +66,38 @@ export const SoundSystem: React.FC = () => {
           {/* Animated Equalizer Waveform with Dynamic Theme Tones */}
           <div className="flex items-end gap-0.5 h-3.5 w-3.5 pb-0.5" aria-hidden="true">
             <span
-              className="w-0.5 rounded-full transition-all duration-100"
+              className={`w-0.5 h-3 rounded-full origin-bottom ${isPlaying && !isMuted ? 'animate-pulse' : ''}`}
               style={{ 
-                height: `${eqHeights[0]}px`,
                 backgroundColor: isPlaying && !isMuted ? 'var(--theme-accent-light, #FF6A00)' : '#4B4B58',
+                transform: isPlaying && !isMuted ? undefined : 'scaleY(0.35)',
+                animationDuration: '0.6s',
               }}
             />
             <span
-              className="w-0.5 rounded-full transition-all duration-100"
+              className={`w-0.5 h-3 rounded-full origin-bottom ${isPlaying && !isMuted ? 'animate-pulse' : ''}`}
               style={{ 
-                height: `${eqHeights[1]}px`,
                 backgroundColor: isPlaying && !isMuted ? 'var(--theme-accent, #FF8C33)' : '#4B4B58',
+                transform: isPlaying && !isMuted ? undefined : 'scaleY(0.55)',
+                animationDuration: '0.9s',
+                animationDelay: '0.2s',
               }}
             />
             <span
-              className="w-0.5 rounded-full transition-all duration-100"
+              className={`w-0.5 h-3 rounded-full origin-bottom ${isPlaying && !isMuted ? 'animate-pulse' : ''}`}
               style={{ 
-                height: `${eqHeights[2]}px`,
                 backgroundColor: isPlaying && !isMuted ? 'var(--theme-accent-light, #FF6A00)' : '#4B4B58',
+                transform: isPlaying && !isMuted ? undefined : 'scaleY(0.75)',
+                animationDuration: '0.7s',
+                animationDelay: '0.35s',
               }}
             />
             <span
-              className="w-0.5 rounded-full transition-all duration-100"
+              className={`w-0.5 h-3 rounded-full origin-bottom ${isPlaying && !isMuted ? 'animate-pulse' : ''}`}
               style={{ 
-                height: `${eqHeights[3]}px`,
                 backgroundColor: isPlaying && !isMuted ? 'var(--theme-accent-deep, #F5B900)' : '#4B4B58',
+                transform: isPlaying && !isMuted ? undefined : 'scaleY(0.4)',
+                animationDuration: '0.8s',
+                animationDelay: '0.1s',
               }}
             />
           </div>

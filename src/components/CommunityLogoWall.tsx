@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Sparkles, Globe2, ShieldCheck, ExternalLink } from 'lucide-react';
 
 interface OrgLogo {
@@ -11,6 +11,23 @@ interface OrgLogo {
 }
 
 export const CommunityLogoWall: React.FC = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.05, rootMargin: '100px 0px' }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   // Row 1: Moves Left
   const rowOne: OrgLogo[] = [
     {
@@ -283,11 +300,12 @@ export const CommunityLogoWall: React.FC = () => {
 
   return (
     <section 
+      ref={sectionRef}
       aria-label="Events, Organizations and Communities"
       className="relative py-20 px-4 sm:px-6 bg-[#060608] border-t border-[#1C1C24] overflow-hidden select-none"
     >
       {/* Subtle Animated Metallic Light Sweep Across Section */}
-      <div className="light-sweep-overlay" />
+      {isInView && <div className="light-sweep-overlay" />}
 
       {/* Header Section */}
       <div className="max-w-7xl mx-auto text-center mb-12 space-y-2 relative z-10">
@@ -296,7 +314,8 @@ export const CommunityLogoWall: React.FC = () => {
             className="w-3.5 h-3.5 animate-spin" 
             style={{ 
               color: 'var(--theme-accent-light, #FF6A00)',
-              animationDuration: '12s'
+              animationDuration: '12s',
+              animationPlayState: isInView ? 'running' : 'paused'
             }} 
           />
           <span style={{ color: 'var(--theme-accent-light, #FF6A00)' }} className="font-bold">
@@ -321,7 +340,10 @@ export const CommunityLogoWall: React.FC = () => {
 
         {/* Row 1: Moves Left */}
         <div className="overflow-hidden flex items-center">
-          <div className="animate-marquee flex items-center gap-4 sm:gap-6 py-1">
+          <div 
+            className="animate-marquee flex items-center gap-4 sm:gap-6 py-1"
+            style={{ animationPlayState: isInView ? 'running' : 'paused' }}
+          >
             {rowOneItems.map((item, idx) => (
               <div
                 key={`${item.id}-${idx}`}
@@ -356,7 +378,10 @@ export const CommunityLogoWall: React.FC = () => {
 
         {/* Row 2: Moves Right (Reverse) */}
         <div className="overflow-hidden flex items-center">
-          <div className="animate-marquee-reverse flex items-center gap-4 sm:gap-6 py-1">
+          <div 
+            className="animate-marquee-reverse flex items-center gap-4 sm:gap-6 py-1"
+            style={{ animationPlayState: isInView ? 'running' : 'paused' }}
+          >
             {rowTwoItems.map((item, idx) => (
               <div
                 key={`${item.id}-${idx}`}

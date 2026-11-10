@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
@@ -27,8 +27,12 @@ import { Terminal, Keyboard, Sparkles } from 'lucide-react';
 export default function App() {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const [hudVisible, setHudVisible] = useState(true);
+  const spotlightRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Skip spotlight tracking on touchscreens
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
     let frameId: number | null = null;
     let targetX = window.innerWidth / 2;
     let targetY = window.innerHeight / 2;
@@ -38,8 +42,10 @@ export default function App() {
       targetY = e.clientY;
       if (!frameId) {
         frameId = requestAnimationFrame(() => {
-          document.documentElement.style.setProperty('--mouse-x', `${targetX}px`);
-          document.documentElement.style.setProperty('--mouse-y', `${targetY}px`);
+          if (spotlightRef.current) {
+            spotlightRef.current.style.setProperty('--mouse-x', `${targetX}px`);
+            spotlightRef.current.style.setProperty('--mouse-y', `${targetY}px`);
+          }
           frameId = null;
         });
       }
@@ -70,7 +76,7 @@ export default function App() {
       />
 
       {/* Dynamic ambient mouse spotlight */}
-      <div className="fixed inset-0 spotlight-overlay z-30 pointer-events-none" />
+      <div ref={spotlightRef} className="fixed inset-0 spotlight-overlay z-30 pointer-events-none" />
 
       {/* Navigation */}
       <Navbar onOpenResume={() => setIsResumeOpen(true)} />

@@ -79,6 +79,7 @@ export interface Certification {
   category: 'AI & Data' | 'Leadership' | 'Software Engineering' | 'Research & Innovation';
   credentialNote: string;
   image: string;
+  thumbnail?: string;
   originalPdf?: string;
   certificateId?: string;
   verificationCodes?: string;
@@ -814,6 +815,7 @@ I believe in learning by building, leading through action and creating technolog
       category: 'AI & Data',
       credentialNote: 'Completed practical tasks in exploratory data analysis and forensic technology.',
       image: '/assets/certificates/deloitte.jpg',
+      thumbnail: '/assets/certificates/thumbnails/deloitte_thumb.webp',
       verificationCodes: 'Enrolment: AQ4Kdj2Wjxi7hwnQk | User: AW7Ae7HJN8Zpkv3do',
       skills: ['Data Analysis', 'Forensic Technology', 'Data Storytelling', 'Deloitte Simulation'],
       brandColors: {
@@ -833,6 +835,7 @@ I believe in learning by building, leading through action and creating technolog
       additionalDetail: 'This certificate confirms the completion of 18 hours of training.',
       credentialNote: 'Gained essential skills in ideation, prototyping, business modeling, and financial planning.',
       image: '/assets/certificates/wadhwani.jpg',
+      thumbnail: '/assets/certificates/thumbnails/wadhwani_thumb.webp',
       skills: ['Ideation', 'Prototyping', 'Business Modeling', 'Financial Planning'],
       brandColors: {
         primary: '#E03A3E',
@@ -851,6 +854,7 @@ I believe in learning by building, leading through action and creating technolog
       additionalDetail: '4th International Conference on Engineering, Social Science & Management (ICESSM-2026)',
       credentialNote: 'Presented research paper: "Machine Learning-Enabled Security for 5G Network Slicing: Challenges, Solutions, and Future Directions".',
       image: '/assets/certificates/icessm.jpg',
+      thumbnail: '/assets/certificates/thumbnails/icessm_thumb.webp',
       skills: ['Machine Learning', '5G Network Slicing', 'Security Architectures', 'Research Defense'],
       brandColors: {
         primary: '#D4AF37',
@@ -869,6 +873,7 @@ I believe in learning by building, leading through action and creating technolog
       additionalDetail: 'Valid through: October 14, 2028',
       credentialNote: 'Demonstrated knowledge, skills, and basic competencies needed to use Google AI.',
       image: '/assets/certificates/gemini.png',
+      thumbnail: '/assets/certificates/thumbnails/gemini_thumb.webp',
       originalPdf: '/assets/aistudio/Gemini_Certificate_70fa0d55.pdf',
       skills: ['Google AI', 'Gemini Models', 'Prompt Engineering', 'Multimodal Systems'],
       brandColors: {
@@ -889,6 +894,7 @@ I believe in learning by building, leading through action and creating technolog
       additionalDetail: 'Participation and successful idea submission',
       credentialNote: 'Recognized for enthusiasm, innovation, and commitment to solving real-world space challenges.',
       image: '/assets/certificates/isro.png',
+      thumbnail: '/assets/certificates/thumbnails/isro_thumb.webp',
       originalPdf: '/assets/aistudio/ISRO_Hackathon_Certificate__379936cd.pdf',
       skills: ['Space Tech Solutions', 'Idea Submission', 'Geospatial Workflows', 'ISRO Hackathon'],
       brandColors: {
@@ -908,6 +914,7 @@ I believe in learning by building, leading through action and creating technolog
       additionalDetail: 'Supported by MSInS, MoSDEE, GoM and DST NIDHI i-TBI, MoST, GoI',
       credentialNote: 'Awarded for remarkable participation reflecting innovation, intellect, and purposeful creation.',
       image: '/assets/certificates/kit_irf.png',
+      thumbnail: '/assets/certificates/thumbnails/kit_irf_thumb.webp',
       originalPdf: '/assets/aistudio/KIT-CERTIFICATE_15a0021b.pdf',
       skills: ['Innovation', 'Intellect', 'Purposeful Creation', 'Startup Ideation'],
       brandColors: {
@@ -927,6 +934,7 @@ I believe in learning by building, leading through action and creating technolog
       verificationCodes: 'Enrolment: Trveq6cLS9LLK6YLt | User: AW7Ae7HJN8Zpkv3do',
       credentialNote: 'Completed exploratory data analysis, delinquency prediction with AI, and AI collections strategy.',
       image: '/assets/certificates/tata_genai.png',
+      thumbnail: '/assets/certificates/thumbnails/tata_genai_thumb.webp',
       originalPdf: '/assets/aistudio/TATA_GEN_AI_Certificate_65961353.pdf',
       skills: ['Exploratory Data Analysis', 'Risk Profiling', 'Delinquency Prediction', 'AI Collections'],
       brandColors: {
@@ -946,6 +954,7 @@ I believe in learning by building, leading through action and creating technolog
       verificationCodes: 'Enrolment: wWBKJBbFWES2KGT6e | User: AW7Ae7HJN8Zpkv3do',
       credentialNote: 'Completed tasks in advanced data structures, software architecture, relational database design, and data munging.',
       image: '/assets/certificates/walmart.png',
+      thumbnail: '/assets/certificates/thumbnails/walmart_thumb.webp',
       originalPdf: '/assets/aistudio/Walmart_Certificate__7a92929e.pdf',
       skills: ['Advanced Data Structures', 'Software Architecture', 'Relational Database Design', 'Data Munging'],
       brandColors: {
@@ -965,6 +974,7 @@ I believe in learning by building, leading through action and creating technolog
       certificateId: 'BH-CA-2026061326',
       credentialNote: 'Awarded for dedication, leadership, and commitment to promoting innovation, creativity, and entrepreneurship.',
       image: '/assets/certificates/buildhub.png',
+      thumbnail: '/assets/certificates/thumbnails/buildhub_thumb.webp',
       originalPdf: '/assets/aistudio/BuildHub_Certificate__5c26e209.pdf',
       skills: ['Leadership', 'Innovation', 'Community Outreach', 'Entrepreneurship'],
       brandColors: {
