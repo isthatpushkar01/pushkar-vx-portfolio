@@ -30,7 +30,7 @@ export const SoundSystem: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    youtubeSoundSystem.initPlayer('yt-embedded-soundtrack-player');
+    youtubeSoundSystem.initPlayer('yt-player-host');
 
     const unsubscribe = youtubeSoundSystem.subscribe(() => {
       setIsPlaying(youtubeSoundSystem.getIsPlaying());

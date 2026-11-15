@@ -61,6 +61,8 @@ export const ResearchPublications: React.FC = () => {
   useEffect(() => {
     if (!certModalOpen && !paperFallbackOpen) return;
 
+    document.body.style.overflow = 'hidden';
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setCertModalOpen(false);
@@ -71,6 +73,7 @@ export const ResearchPublications: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
+      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [certModalOpen, paperFallbackOpen]);

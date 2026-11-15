@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { X, Download, Printer, Copy, Check, FileText } from 'lucide-react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
 import confetti from 'canvas-confetti';
@@ -10,6 +10,7 @@ interface ResumeModalProps {
 
 export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => {
   const [copied, setCopied] = useState(false);
+  const copyTimerRef = useRef<number | null>(null);
   const p = PORTFOLIO_DATA.personal;
 
   useEffect(() => {
@@ -20,13 +21,21 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose }) => 
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current !== null) {
+        window.clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -87,12 +96,18 @@ HONORS & HACKATHONS
 
     try {
       await navigator.clipboard.writeText(textContent);
-      setCopied(true);
       confetti({ particleCount: 35, spread: 60, origin: { y: 0.8 } });
-      setTimeout(() => setCopied(false), 2500);
     } catch {
+      // Fallback copy notification state
+    } finally {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      if (copyTimerRef.current !== null) {
+        window.clearTimeout(copyTimerRef.current);
+      }
+      copyTimerRef.current = window.setTimeout(() => {
+        setCopied(false);
+        copyTimerRef.current = null;
+      }, 2500);
     }
   };
 

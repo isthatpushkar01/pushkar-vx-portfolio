@@ -64,24 +64,29 @@ export default function App() {
     <div
       className="min-h-screen bg-[#08090B] text-[#F5F5F5] relative selection:bg-[var(--theme-selection,rgba(255,106,0,0.3))] selection:text-white"
     >
-      {/* Premium Custom Mechanical Reticle Cursor */}
-      <CustomCursor />
+      {/* Decorative layers isolated so they can never blank out the portfolio */}
+      <ErrorBoundary silent sectionName="Custom Cursor">
+        <CustomCursor />
+      </ErrorBoundary>
 
-      {/* Subtle Distant Cybernetic Easter Egg */}
-      <WebSlingingCyberHero />
+      <ErrorBoundary silent sectionName="Cybernetic Easter Egg">
+        <WebSlingingCyberHero />
+      </ErrorBoundary>
 
-      {/* Official YouTube IFrame Player Persistent Node (in-viewport 1x1 prevents Chromium compositor culling) */}
-      <div 
-        id="yt-embedded-soundtrack-player" 
-        aria-hidden="true" 
-        className="fixed bottom-0 right-0 w-px h-px overflow-hidden opacity-0 pointer-events-none" 
+      {/* Inert React-empty host for YouTube IFrame API (imperative DOM replacement stays isolated from React Fibers) */}
+      <div
+        id="yt-player-host"
+        aria-hidden="true"
+        className="fixed bottom-0 right-0 w-px h-px overflow-hidden opacity-0 pointer-events-none"
       />
 
       {/* Dynamic ambient mouse spotlight */}
       <div ref={spotlightRef} className="fixed inset-0 spotlight-overlay z-0 pointer-events-none" />
 
       {/* Navigation */}
-      <Navbar onOpenResume={() => setIsResumeOpen(true)} />
+      <ErrorBoundary compact sectionName="Navigation Bar">
+        <Navbar onOpenResume={() => setIsResumeOpen(true)} />
+      </ErrorBoundary>
 
       {/* Main Content Sections */}
       <main className="relative z-10">
@@ -111,16 +116,22 @@ export default function App() {
       </main>
 
       {/* Distinctive Animated Bottom Community Logo Wall */}
-      <CommunityLogoWall />
+      <ErrorBoundary compact sectionName="Community Showcase">
+        <CommunityLogoWall />
+      </ErrorBoundary>
 
       {/* Footer */}
-      <Footer onOpenResume={() => setIsResumeOpen(true)} />
+      <ErrorBoundary compact sectionName="Footer">
+        <Footer onOpenResume={() => setIsResumeOpen(true)} />
+      </ErrorBoundary>
 
       {/* Curriculum Vitae Modal */}
-      <ResumeModal
-        isOpen={isResumeOpen}
-        onClose={() => setIsResumeOpen(false)}
-      />
+      <ErrorBoundary compact sectionName="Resume Viewer">
+        <ResumeModal
+          isOpen={isResumeOpen}
+          onClose={() => setIsResumeOpen(false)}
+        />
+      </ErrorBoundary>
 
       {/* Floating Interactive Keyboard Helper HUD */}
       {hudVisible && (
@@ -136,6 +147,7 @@ export default function App() {
           <span className="text-white font-bold bg-[#1C1C24] px-1.5 py-0.5 rounded border border-[#333340]">[T]</span>
           <span className="text-white font-bold bg-[#1C1C24] px-1.5 py-0.5 rounded border border-[#333340]">[F]</span>
           <button
+            type="button"
             onClick={() => setHudVisible(false)}
             className="ml-2 text-[#55555A] hover:text-white transition-colors cursor-pointer"
             title="Dismiss HUD"

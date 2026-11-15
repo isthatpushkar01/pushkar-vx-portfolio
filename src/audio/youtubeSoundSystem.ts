@@ -3,6 +3,11 @@
  * Official YouTube IFrame Player API integration.
  * Strictly compliant with YouTube API terms: uses official iframe player,
  * zero audio extraction or downloading.
+ *
+ * DOM Isolation Architecture:
+ * Creates and owns an unmanaged child element inside a dedicated React-empty host
+ * (`#yt-player-host`) so `YT.Player`'s internal `replaceChild(iframe, div)` never
+ * mutates React-managed Fiber siblings or triggers `insertBefore` reconciliation errors.
  */
 
 export interface TrackTheme {
@@ -179,11 +184,14 @@ class YouTubeSoundSystem {
   private pendingPlay: boolean = false;
   private hasUserPaused: boolean = false;
   private needsSoundActivation: boolean = false;
-  private containerId: string = 'yt-embedded-soundtrack-player';
+  private hostId: string = 'yt-player-host';
   private isScriptLoading: boolean = false;
   private initScheduled: boolean = false;
   private autoplayCheckTimer: number | null = null;
-  private interactionBound: boolean = false;
+  private idleTimerId: ReturnType<typeof setTimeout> | null = null;
+  private idleCallbackId: number | null = null;
+  private loadHandler: (() => void) | null = null;
+  private interactionHandler: (() => void) | null = null;
 
   constructor() {
     try {
@@ -258,14 +266,18 @@ class YouTubeSoundSystem {
     this.notify();
   }
 
+  private unbindFirstInteraction(): void {
+    if (!this.interactionHandler || typeof window === 'undefined') return;
+    window.removeEventListener('pointerdown', this.interactionHandler, true);
+    window.removeEventListener('keydown', this.interactionHandler, true);
+    this.interactionHandler = null;
+  }
+
   private bindFirstInteractionFallback(): void {
-    if (this.interactionBound || typeof window === 'undefined') return;
-    this.interactionBound = true;
+    if (this.interactionHandler || typeof window === 'undefined') return;
 
     const handleFirstInteraction = () => {
-      window.removeEventListener('pointerdown', handleFirstInteraction, true);
-      window.removeEventListener('keydown', handleFirstInteraction, true);
-      this.interactionBound = false;
+      this.unbindFirstInteraction();
 
       if (this.hasUserPaused || !this.needsSoundActivation) return;
 
@@ -287,47 +299,73 @@ class YouTubeSoundSystem {
       this.notify();
     };
 
+    this.interactionHandler = handleFirstInteraction;
     window.addEventListener('pointerdown', handleFirstInteraction, { capture: true, passive: true });
     window.addEventListener('keydown', handleFirstInteraction, { capture: true, passive: true });
   }
 
-  public initPlayer(containerId: string): void {
+  public initPlayer(hostId: string): void {
     if (typeof window === 'undefined') return;
-    this.containerId = containerId;
+    this.hostId = hostId;
     applyTrackTheme(this.currentTrackIndex);
 
     if (this.player || this.initScheduled) return;
     this.initScheduled = true;
 
     const scheduleInit = () => {
+      this.loadHandler = null;
       const win = window as Window & {
         requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
       };
       if (typeof win.requestIdleCallback === 'function') {
-        win.requestIdleCallback(() => this.loadApiAndCreatePlayer(), { timeout: 1500 });
+        this.idleCallbackId = win.requestIdleCallback(
+          () => {
+            this.idleCallbackId = null;
+            this.loadApiAndCreatePlayer();
+          },
+          { timeout: 1500 }
+        );
       } else {
-        globalThis.setTimeout(() => this.loadApiAndCreatePlayer(), 800);
+        this.idleTimerId = globalThis.setTimeout(() => {
+          this.idleTimerId = null;
+          this.loadApiAndCreatePlayer();
+        }, 800);
       }
     };
 
     if (document.readyState === 'complete') {
       scheduleInit();
     } else {
+      this.loadHandler = scheduleInit;
       window.addEventListener('load', scheduleInit, { once: true });
     }
   }
 
+  private createUnmanagedMountNode(): HTMLElement | null {
+    const host = document.getElementById(this.hostId);
+    if (!host) return null;
+    host.innerHTML = '';
+    const mount = document.createElement('div');
+    mount.id = 'yt-embedded-soundtrack-player';
+    host.appendChild(mount);
+    return mount;
+  }
+
   private loadApiAndCreatePlayer(): void {
     if (this.player || this.isScriptLoading || typeof window === 'undefined') return;
-    if (!document.getElementById(this.containerId)) return;
+    if (!document.getElementById(this.hostId)) return;
     this.isScriptLoading = true;
 
     const onScriptLoaded = () => {
       if (!window.YT || !window.YT.Player || this.player) return;
-      if (!document.getElementById(this.containerId)) return;
+      const mountNode = this.createUnmanagedMountNode();
+      if (!mountNode) {
+        this.isScriptLoading = false;
+        return;
+      }
 
       try {
-        this.player = new window.YT.Player(this.containerId, {
+        this.player = new window.YT.Player(mountNode, {
           videoId: TRACKS[this.currentTrackIndex].videoId,
           playerVars: {
             autoplay: 1,
@@ -353,7 +391,6 @@ class YouTubeSoundSystem {
               if (!this.hasUserPaused) {
                 event.target.playVideo();
 
-                // Detect browser-blocked audible autoplay and degrade gracefully to muted autoplay / non-blocking prompt
                 if (this.autoplayCheckTimer !== null) {
                   window.clearTimeout(this.autoplayCheckTimer);
                 }
@@ -437,7 +474,11 @@ class YouTubeSoundSystem {
           this.notify();
         };
         const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
+        if (firstScriptTag?.parentNode) {
+          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        } else {
+          document.head.appendChild(tag);
+        }
       }
       const prevCallback = window.onYouTubeIframeAPIReady;
       window.onYouTubeIframeAPIReady = () => {
@@ -452,6 +493,7 @@ class YouTubeSoundSystem {
     this.hasUserPaused = false;
     this.needsSoundActivation = false;
     this.isMuted = false;
+    this.unbindFirstInteraction();
 
     try {
       sessionStorage.setItem('vx_yt_muted', 'false');
@@ -592,6 +634,20 @@ class YouTubeSoundSystem {
       window.clearTimeout(this.autoplayCheckTimer);
       this.autoplayCheckTimer = null;
     }
+    if (this.idleTimerId !== null) {
+      clearTimeout(this.idleTimerId);
+      this.idleTimerId = null;
+    }
+    if (this.idleCallbackId !== null && typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+      (window as Window & { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(this.idleCallbackId);
+      this.idleCallbackId = null;
+    }
+    if (this.loadHandler && typeof window !== 'undefined') {
+      window.removeEventListener('load', this.loadHandler);
+      this.loadHandler = null;
+    }
+    this.unbindFirstInteraction();
+
     if (this.player) {
       try {
         this.player.destroy();
@@ -599,10 +655,15 @@ class YouTubeSoundSystem {
         // Ignore
       }
       this.player = null;
-      this.isReady = false;
-      this.isPlaying = false;
-      this.initScheduled = false;
     }
+    const host = typeof document !== 'undefined' ? document.getElementById(this.hostId) : null;
+    if (host) {
+      host.innerHTML = '';
+    }
+    this.isReady = false;
+    this.isPlaying = false;
+    this.isScriptLoading = false;
+    this.initScheduled = false;
   }
 }
 

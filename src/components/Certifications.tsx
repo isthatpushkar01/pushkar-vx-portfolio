@@ -128,6 +128,8 @@ export const Certifications: React.FC = () => {
   useEffect(() => {
     if (!selectedCert) return;
 
+    document.body.style.overflow = 'hidden';
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         closeCert();
@@ -143,7 +145,10 @@ export const Certifications: React.FC = () => {
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [selectedCert, certifications]);
 
   const handlePrev = (e: React.MouseEvent) => {

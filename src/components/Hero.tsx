@@ -16,6 +16,13 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
   const portraitRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (
+      window.matchMedia('(pointer: coarse)').matches ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
+
     let frameId: number | null = null;
     const handleMouseMove = (e: MouseEvent) => {
       if (frameId) return;

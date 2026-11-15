@@ -6,24 +6,28 @@ interface ThreeNeuralCoreProps {
   interactive?: boolean;
 }
 
-let cachedIsSoftwareGl: boolean | null = null;
+let cachedWebGlProbe: { supported: boolean; isSoftware: boolean } | null = null;
 function detectSoftwareWebGL(): { supported: boolean; isSoftware: boolean } {
+  if (cachedWebGlProbe !== null) {
+    return cachedWebGlProbe;
+  }
   try {
     const probeCanvas = document.createElement('canvas');
     const gl = probeCanvas.getContext('webgl2') || probeCanvas.getContext('webgl');
     if (!gl) {
-      return { supported: false, isSoftware: true };
+      cachedWebGlProbe = { supported: false, isSoftware: true };
+      return cachedWebGlProbe;
     }
-    if (cachedIsSoftwareGl === null) {
-      const ext = gl.getExtension('WEBGL_debug_renderer_info');
-      const param = ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER;
-      const gpu = String(gl.getParameter(param) || '');
-      cachedIsSoftwareGl = /SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(gpu);
-    }
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    const param = ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER;
+    const gpu = String(gl.getParameter(param) || '');
+    const isSoftware = /SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(gpu);
     gl.getExtension('WEBGL_lose_context')?.loseContext();
-    return { supported: true, isSoftware: cachedIsSoftwareGl };
+    cachedWebGlProbe = { supported: true, isSoftware };
+    return cachedWebGlProbe;
   } catch {
-    return { supported: false, isSoftware: true };
+    cachedWebGlProbe = { supported: false, isSoftware: true };
+    return cachedWebGlProbe;
   }
 }
 
@@ -261,10 +265,12 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
         renderer.render(scene, camera);
 
         if (isSoftwareGl) {
-          // Software WebGL frame pacing via RAF skip without blocking main thread
+          // Software WebGL frame pacing via RAF skip without leaving stale non-null loop ID
           animationFrameId = requestAnimationFrame((nextNow) => {
             if (shouldRun()) {
               animationFrameId = requestAnimationFrame(animate);
+            } else {
+              animationFrameId = null;
             }
             void nextNow;
           });
