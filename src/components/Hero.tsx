@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { ArrowDown, Sparkles, Terminal, FileText, Cpu, MapPin, Award, CheckCircle } from 'lucide-react';
 import { MechanicalConsole } from './MechanicalConsole';
 import { ThreeNeuralCore } from './ThreeNeuralCore';
+import { ErrorBoundary } from './ErrorBoundary';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
 import pushkarActualPortrait from '../assets/images/pushkar_actual_portrait.webp';
 import pushkarTransparentPortrait from '../assets/images/pushkar_portrait_transparent.webp';
@@ -43,7 +44,9 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
       {/* Background 3D Neural Core Simulation */}
       <div className="absolute inset-0 z-0 flex items-center justify-center opacity-25 sm:opacity-35 pointer-events-none">
         <div className="w-[500px] h-[500px] sm:w-[650px] sm:h-[650px]">
-          <ThreeNeuralCore />
+          <ErrorBoundary compact sectionName="Neural Core">
+            <ThreeNeuralCore />
+          </ErrorBoundary>
         </div>
       </div>
 
@@ -60,7 +63,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
         {/* Left Column: Personal Introduction */}
         <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-4">
           {/* Top Status Capsule */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0D0D14]/90 border border-[#2B2B36] backdrop-blur-md shadow-xl">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0D0D14]/95 border border-[#2B2B36] shadow-xl">
             <span className="w-2 h-2 rounded-full bg-[#A6E635] animate-ping shadow-[0_0_8px_#A6E635]" />
             <span className="text-[11px] font-mono tracking-widest text-[#A6E635] font-bold">
               STATUS: ACTIVE // OPEN TO OPPORTUNITIES
@@ -196,7 +199,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
         </div>
 
         {/* Professional Identity Subtitle */}
-        <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-mono text-[#8E8E93] bg-[#0E0E14]/85 px-4 py-1.5 rounded-full border border-[#22222C] backdrop-blur-sm">
+        <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-mono text-[#8E8E93] bg-[#0E0E14]/95 px-4 py-1.5 rounded-full border border-[#22222C]">
           <span className="text-white font-semibold">AI ENGINEER</span>
           <span style={{ color: 'var(--theme-accent-light, #FF6A00)' }} className="font-bold">•</span>
           <span style={{ color: 'var(--theme-accent-light, #FF6A00)' }} className="font-semibold">GENERATIVE AI DEVELOPER</span>
@@ -213,7 +216,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
       {/* 6. BOTTOM PROFILE SUMMARY & TELEMETRY BADGE BAR */}
       <div className="relative z-10 mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-4xl mx-auto">
         {/* Profile Card */}
-        <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-[#0D0D12]/95 border border-[#262630] backdrop-blur-md shadow-lg">
+        <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-[#0D0D12]/95 border border-[#262630] shadow-lg">
           <img
             src={pushkarActualPortrait}
             alt="Pushkar Vishwakarma"
@@ -231,7 +234,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
         </div>
 
         {/* Academic & Ambassador Telemetry */}
-        <div className="flex flex-col justify-center p-3 rounded-2xl bg-[#0D0D12]/95 border border-[#262630] backdrop-blur-md shadow-lg text-left font-mono">
+        <div className="flex flex-col justify-center p-3 rounded-2xl bg-[#0D0D12]/95 border border-[#262630] shadow-lg text-left font-mono">
           <div className="flex items-center justify-between text-[11px]">
             <span className="text-[#8E8E93]">ACADEMIC CGPA:</span>
             <span className="text-[#A6E635] font-bold">8.39 / 10.0</span>
@@ -247,7 +250,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenResume }) => {
         </div>
 
         {/* Primary Action Triggers */}
-        <div className="flex items-center gap-2 p-3 rounded-2xl bg-[#0D0D12]/95 border border-[#262630] backdrop-blur-md shadow-lg">
+        <div className="flex items-center gap-2 p-3 rounded-2xl bg-[#0D0D12]/95 border border-[#262630] shadow-lg">
           <a
             href="#projects"
             className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-white text-xs font-mono font-black uppercase transition-all shadow-md active:translate-y-0.5"

@@ -32,8 +32,9 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
   const [displayIndex, setDisplayIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const consoleRef = useRef<HTMLDivElement>(null);
-  const isVisibleRef = useRef<boolean>(true);
+  const [isVisible, setIsVisible] = useState<boolean>(true);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const keyTimeoutRef = useRef<number | null>(null);
 
   // Typewriter phrases
   const phrases = [
@@ -266,41 +267,52 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
     },
   ];
 
-  // Typewriter loop with IntersectionObserver pause
+  // Typewriter loop with IntersectionObserver + tab visibility pause
   useEffect(() => {
     const el = consoleRef.current;
     if (!el) return;
 
+    let intersecting = true;
+    const sync = () => {
+      setIsVisible(intersecting && !document.hidden);
+    };
+
     const observer = new IntersectionObserver(([entry]) => {
-      isVisibleRef.current = entry.isIntersecting && !document.hidden;
+      intersecting = entry.isIntersecting;
+      sync();
     }, { threshold: 0.1 });
     observer.observe(el);
 
-    return () => observer.disconnect();
+    document.addEventListener('visibilitychange', sync);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', sync);
+      if (keyTimeoutRef.current !== null) {
+        window.clearTimeout(keyTimeoutRef.current);
+      }
+      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+        void audioCtxRef.current.close().catch(() => {});
+      }
+    };
   }, []);
 
   useEffect(() => {
-    const currentPhrase = phrases[displayIndex];
-    let timer: NodeJS.Timeout;
+    if (!isVisible) return;
 
-    if (!isVisibleRef.current) {
-      timer = setTimeout(() => {
-        setDisplayIndex((prev) => (prev + 1) % phrases.length);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
+    const currentPhrase = phrases[displayIndex];
+    let timer: number;
 
     if (!isDeleting) {
       if (displayText.length < currentPhrase.length) {
-        timer = setTimeout(() => {
+        timer = window.setTimeout(() => {
           setDisplayText(currentPhrase.substring(0, displayText.length + 1));
         }, 55);
       } else {
-        timer = setTimeout(() => setIsDeleting(true), 2400);
+        timer = window.setTimeout(() => setIsDeleting(true), 2400);
       }
     } else {
       if (displayText.length > 0) {
-        timer = setTimeout(() => {
+        timer = window.setTimeout(() => {
           setDisplayText(currentPhrase.substring(0, displayText.length - 1));
         }, 25);
       } else {
@@ -309,8 +321,8 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
       }
     }
 
-    return () => clearTimeout(timer);
-  }, [displayText, isDeleting, displayIndex]);
+    return () => window.clearTimeout(timer);
+  }, [displayText, isDeleting, displayIndex, isVisible]);
 
   // Handle key activation (click or hardware press)
   const triggerKeyAction = (key: KeyConfig) => {
@@ -321,8 +333,12 @@ export const MechanicalConsole: React.FC<MechanicalConsoleProps> = ({ onOpenResu
     // Dispatch pulse to 3D Neural Core
     window.dispatchEvent(new CustomEvent('portal-key-actuate', { detail: { keyId: key.id } }));
 
-    setTimeout(() => {
+    if (keyTimeoutRef.current !== null) {
+      window.clearTimeout(keyTimeoutRef.current);
+    }
+    keyTimeoutRef.current = window.setTimeout(() => {
       setActiveKey(null);
+      keyTimeoutRef.current = null;
     }, 200);
 
     if (key.sectionId === 'resume') {

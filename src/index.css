@@ -364,25 +364,38 @@ code, pre, .font-mono {
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .animate-marquee,
-  .animate-marquee-reverse,
-  .light-sweep-overlay {
-    animation: none !important;
+@keyframes cyberSwing {
+  0% {
+    transform: translate3d(-150px, -20px, 0) rotate(-25deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate3d(50vw, 80px, 0) rotate(5deg);
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate3d(115vw, -30px, 0) rotate(25deg);
+    opacity: 0;
   }
 }
 
-/* Hardware-accelerated below-the-fold layout containment */
-#projects,
-#experience,
-#skills,
-#innovation,
-#explore,
-#achievements,
-#certifications,
-#beyond-tech {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 700px;
+.cyber-swing-runner {
+  animation: cyberSwing 3.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-reverse,
+  .light-sweep-overlay,
+  .cyber-swing-runner {
+    animation: none !important;
+  }
 }
 
 

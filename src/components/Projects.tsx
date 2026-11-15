@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Terminal, ExternalLink, Github, Layers, Cpu, ArrowUpRight, CheckCircle2, Play, Activity } from 'lucide-react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
 import skillbridgeImg from '../assets/images/skillbridge_preview.webp';
@@ -9,32 +9,44 @@ export const Projects: React.FC = () => {
   const projects = PORTFOLIO_DATA.projects;
   const [activeTabMap, setActiveTabMap] = useState<Record<string, 'features' | 'pipeline' | 'telemetry'>>({});
   const [simulatingMap, setSimulatingMap] = useState<Record<string, boolean>>({});
+  const timersRef = useRef<Record<string, number>>({});
+
+  useEffect(() => {
+    return () => {
+      Object.values(timersRef.current).forEach((timerId) => window.clearTimeout(timerId));
+      timersRef.current = {};
+    };
+  }, []);
 
   const projectImages: Record<string, string> = {
-    skillbridge: skillbridgeImg,
-    agrisense: agrisenseImg,
-    ghatshield: ghatshieldImg,
+    'skillbridge-ai': skillbridgeImg,
+    'agrisense-ai': agrisenseImg,
+    'ghatshield-ai': ghatshieldImg,
   };
 
   const projectSimulations: Record<string, { label: string; result: string }> = {
-    skillbridge: {
+    'skillbridge-ai': {
       label: 'RUN NLP RESUME MATCH',
       result: 'SIMULATION RESULT: Parsed vector profile · 94.2% Job Fit · Auto-generated 4-week roadmap in 218ms',
     },
-    agrisense: {
+    'agrisense-ai': {
       label: 'QUERY N-P-K SOIL SENSOR',
       result: 'SIMULATION RESULT: Telemetry N=45, P=28, K=110 · Optimal: Soybean · Dialect: Hindi Audio Stream Ready',
     },
-    ghatshield: {
+    'ghatshield-ai': {
       label: 'STREAM RIVERINE TELEMETRY',
       result: 'SIMULATION RESULT: Upper Lake pH=7.8 | DO=6.2mg/L · Audit generated & compiled in 1.1s via Claude 3.5',
     },
   };
 
   const handleSimulate = (id: string) => {
+    if (timersRef.current[id]) {
+      window.clearTimeout(timersRef.current[id]);
+    }
     setSimulatingMap((prev) => ({ ...prev, [id]: true }));
-    setTimeout(() => {
+    timersRef.current[id] = window.setTimeout(() => {
       setSimulatingMap((prev) => ({ ...prev, [id]: false }));
+      delete timersRef.current[id];
     }, 2500);
   };
 

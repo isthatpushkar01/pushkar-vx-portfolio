@@ -8,14 +8,14 @@
 export interface TrackTheme {
   id: string;
   name: string;
-  primaryAccent: string;     // Base color (#FF6A00, #3C0061, #5A262C)
-  accentLight: string;       // High-contrast readable tone against black
-  accentDeep: string;        // Deep accent shade
-  accentGlow: string;        // Box-shadow glow
-  accentGlowSubtle: string;  // Ambient subtle glow
-  bgAmbient: string;         // Spotlight overlay & backdrop ambient
-  selectionBg: string;       // Browser selection background
-  buttonGradient: string;    // Gradient for primary buttons
+  primaryAccent: string;
+  accentLight: string;
+  accentDeep: string;
+  accentGlow: string;
+  accentGlowSubtle: string;
+  bgAmbient: string;
+  selectionBg: string;
+  buttonGradient: string;
   buttonHoverGradient: string;
   buttonShadow: string;
   badgeBg: string;
@@ -67,9 +67,7 @@ export const TRACKS: Track[] = [
     theme: {
       id: 'purple',
       name: 'DEEP PURPLE',
-      // Strict exact primary accent: #3C0061
       primaryAccent: '#3C0061',
-      // High-contrast luminous purple for readable text/borders on pure black
       accentLight: '#A855F7',
       accentDeep: '#26003E',
       accentGlow: 'rgba(168, 85, 247, 0.45)',
@@ -93,9 +91,7 @@ export const TRACKS: Track[] = [
     theme: {
       id: 'burgundy',
       name: 'DEEP BURGUNDY',
-      // Strict exact primary accent: #5A262C
       primaryAccent: '#5A262C',
-      // High-contrast luminous burgundy-rose for readable text/borders on pure black
       accentLight: '#C04A55',
       accentDeep: '#3B181C',
       accentGlow: 'rgba(192, 74, 85, 0.45)',
@@ -154,9 +150,6 @@ export interface YTPlayerInstance {
   destroy: () => void;
 }
 
-/**
- * Apply dynamic CSS custom properties corresponding to the chosen track theme.
- */
 export function applyTrackTheme(trackIndex: number): void {
   if (typeof document === 'undefined') return;
   const track = TRACKS[trackIndex] || TRACKS[0];
@@ -175,7 +168,6 @@ export function applyTrackTheme(trackIndex: number): void {
 
 class YouTubeSoundSystem {
   private player: YTPlayerInstance | null = null;
-  // Requirement 3: Random Track Selection on Every Visit with 1/3 equal probability
   private currentTrackIndex: number = Math.floor(Math.random() * TRACKS.length);
   private isPlaying: boolean = false;
   private isMuted: boolean = false;
@@ -186,11 +178,20 @@ class YouTubeSoundSystem {
   private listeners: Set<() => void> = new Set();
   private pendingPlay: boolean = false;
   private hasUserPaused: boolean = false;
+  private needsSoundActivation: boolean = false;
+  private containerId: string = 'yt-embedded-soundtrack-player';
+  private isScriptLoading: boolean = false;
+  private initScheduled: boolean = false;
+  private autoplayCheckTimer: number | null = null;
+  private interactionBound: boolean = false;
 
   constructor() {
     try {
       const savedVol = sessionStorage.getItem('vx_yt_volume');
-      if (savedVol !== null) this.volume = parseInt(savedVol, 10);
+      if (savedVol !== null) {
+        const parsed = parseInt(savedVol, 10);
+        if (!Number.isNaN(parsed)) this.volume = Math.max(0, Math.min(100, parsed));
+      }
 
       const savedMute = sessionStorage.getItem('vx_yt_muted');
       if (savedMute !== null) this.isMuted = savedMute === 'true';
@@ -198,7 +199,6 @@ class YouTubeSoundSystem {
       // Storage fallback
     }
 
-    // Apply the theme of the randomly selected track immediately
     applyTrackTheme(this.currentTrackIndex);
   }
 
@@ -208,7 +208,13 @@ class YouTubeSoundSystem {
   }
 
   private notify() {
-    this.listeners.forEach((l) => l());
+    this.listeners.forEach((l) => {
+      try {
+        l();
+      } catch {
+        // Isolate subscriber failures
+      }
+    });
   }
 
   public getCurrentTrack(): Track {
@@ -243,30 +249,64 @@ class YouTubeSoundSystem {
     return this.playlistMode;
   }
 
+  public getNeedsSoundActivation(): boolean {
+    return this.needsSoundActivation;
+  }
+
   public togglePlaylistMode(): void {
     this.playlistMode = !this.playlistMode;
     this.notify();
   }
 
-  private containerId: string = 'yt-embedded-soundtrack-player';
-  private isScriptLoading: boolean = false;
+  private bindFirstInteractionFallback(): void {
+    if (this.interactionBound || typeof window === 'undefined') return;
+    this.interactionBound = true;
+
+    const handleFirstInteraction = () => {
+      window.removeEventListener('pointerdown', handleFirstInteraction, true);
+      window.removeEventListener('keydown', handleFirstInteraction, true);
+      this.interactionBound = false;
+
+      if (this.hasUserPaused || !this.needsSoundActivation) return;
+
+      this.needsSoundActivation = false;
+      this.isMuted = false;
+
+      if (this.player && this.isReady) {
+        try {
+          this.player.unMute();
+          this.player.setVolume(this.volume);
+          this.player.playVideo();
+        } catch {
+          // Ignore browser restriction
+        }
+      } else {
+        this.pendingPlay = true;
+        this.loadApiAndCreatePlayer();
+      }
+      this.notify();
+    };
+
+    window.addEventListener('pointerdown', handleFirstInteraction, { capture: true, passive: true });
+    window.addEventListener('keydown', handleFirstInteraction, { capture: true, passive: true });
+  }
 
   public initPlayer(containerId: string): void {
-    if (this.player || typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return;
     this.containerId = containerId;
-
-    // Apply active theme immediately on initial load
     applyTrackTheme(this.currentTrackIndex);
 
-    // Defer YouTube iframe API script loading to idle time or first interaction
+    if (this.player || this.initScheduled) return;
+    this.initScheduled = true;
+
     const scheduleInit = () => {
-      if ('requestIdleCallback' in window) {
-        (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void }).requestIdleCallback(
-          () => this.loadApiAndCreatePlayer(),
-          { timeout: 3500 }
-        );
+      const win = window as Window & {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      };
+      if (typeof win.requestIdleCallback === 'function') {
+        win.requestIdleCallback(() => this.loadApiAndCreatePlayer(), { timeout: 1500 });
       } else {
-        setTimeout(() => this.loadApiAndCreatePlayer(), 2500);
+        globalThis.setTimeout(() => this.loadApiAndCreatePlayer(), 800);
       }
     };
 
@@ -279,42 +319,84 @@ class YouTubeSoundSystem {
 
   private loadApiAndCreatePlayer(): void {
     if (this.player || this.isScriptLoading || typeof window === 'undefined') return;
+    if (!document.getElementById(this.containerId)) return;
     this.isScriptLoading = true;
 
     const onScriptLoaded = () => {
-      if (!window.YT || !window.YT.Player) return;
-      if (this.player) return;
+      if (!window.YT || !window.YT.Player || this.player) return;
+      if (!document.getElementById(this.containerId)) return;
 
-      this.player = new window.YT.Player(this.containerId, {
-        videoId: TRACKS[this.currentTrackIndex].videoId,
-        playerVars: {
-          autoplay: 0,
-          controls: 0,
-          disablekb: 1,
-          fs: 0,
-          modestbranding: 1,
-          rel: 0,
-          playsinline: 1,
-          origin: window.location.origin,
-        },
-        events: {
-          onReady: (event) => {
-            this.isReady = true;
-            this.isScriptLoading = false;
-            event.target.setVolume(this.volume);
-            if (this.isMuted) event.target.mute();
-
-            if (this.pendingPlay) {
-              this.pendingPlay = false;
-              event.target.playVideo();
-            }
-            this.notify();
+      try {
+        this.player = new window.YT.Player(this.containerId, {
+          videoId: TRACKS[this.currentTrackIndex].videoId,
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+            disablekb: 1,
+            fs: 0,
+            modestbranding: 1,
+            rel: 0,
+            playsinline: 1,
+            origin: window.location.origin,
           },
-          onStateChange: (event) => {
-            if (window.YT) {
+          events: {
+            onReady: (event) => {
+              this.isReady = true;
+              this.isScriptLoading = false;
+              event.target.setVolume(this.volume);
+              if (this.isMuted) {
+                event.target.mute();
+              } else {
+                event.target.unMute();
+              }
+
+              if (!this.hasUserPaused) {
+                event.target.playVideo();
+
+                // Detect browser-blocked audible autoplay and degrade gracefully to muted autoplay / non-blocking prompt
+                if (this.autoplayCheckTimer !== null) {
+                  window.clearTimeout(this.autoplayCheckTimer);
+                }
+                this.autoplayCheckTimer = window.setTimeout(() => {
+                  this.autoplayCheckTimer = null;
+                  if (!this.player || !this.isReady || this.hasUserPaused) return;
+                  try {
+                    const state = this.player.getPlayerState();
+                    const yt = window.YT?.PlayerState;
+                    const active = yt ? state === yt.PLAYING || state === yt.BUFFERING : state === 1 || state === 3;
+                    if (!active) {
+                      this.player.mute();
+                      this.player.playVideo();
+                      this.isMuted = true;
+                      this.needsSoundActivation = true;
+                      this.bindFirstInteractionFallback();
+                      this.notify();
+                    }
+                  } catch {
+                    this.needsSoundActivation = true;
+                    this.bindFirstInteractionFallback();
+                    this.notify();
+                  }
+                }, 1100);
+              } else if (this.pendingPlay) {
+                this.pendingPlay = false;
+                event.target.playVideo();
+              }
+              this.notify();
+            },
+            onStateChange: (event) => {
+              if (!window.YT) return;
               if (event.data === window.YT.PlayerState.PLAYING) {
                 this.isPlaying = true;
                 this.hasError = false;
+                try {
+                  this.isMuted = Boolean(this.player?.isMuted());
+                  if (!this.isMuted) {
+                    this.needsSoundActivation = false;
+                  }
+                } catch {
+                  // Ignore read error
+                }
               } else if (event.data === window.YT.PlayerState.PAUSED) {
                 this.isPlaying = false;
               } else if (event.data === window.YT.PlayerState.ENDED) {
@@ -323,17 +405,21 @@ class YouTubeSoundSystem {
                   this.nextTrack();
                 }
               }
-            }
-            this.notify();
+              this.notify();
+            },
+            onError: () => {
+              this.hasError = true;
+              this.isPlaying = false;
+              this.isScriptLoading = false;
+              this.notify();
+            },
           },
-          onError: () => {
-            this.hasError = true;
-            this.isPlaying = false;
-            this.isScriptLoading = false;
-            this.notify();
-          },
-        },
-      });
+        });
+      } catch {
+        this.isScriptLoading = false;
+        this.hasError = true;
+        this.notify();
+      }
     };
 
     if (window.YT && window.YT.Player) {
@@ -345,19 +431,54 @@ class YouTubeSoundSystem {
         tag.id = 'youtube-iframe-api';
         tag.src = 'https://www.youtube.com/iframe_api';
         tag.async = true;
+        tag.onerror = () => {
+          this.isScriptLoading = false;
+          this.hasError = true;
+          this.notify();
+        };
         const firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
       }
+      const prevCallback = window.onYouTubeIframeAPIReady;
       window.onYouTubeIframeAPIReady = () => {
+        if (prevCallback) prevCallback();
         onScriptLoaded();
       };
     }
   }
 
+  public enableSoundFromPrompt(): void {
+    this.hasError = false;
+    this.hasUserPaused = false;
+    this.needsSoundActivation = false;
+    this.isMuted = false;
+
+    try {
+      sessionStorage.setItem('vx_yt_muted', 'false');
+    } catch {
+      // Fallback
+    }
+
+    if (this.player && this.isReady) {
+      this.player.unMute();
+      this.player.setVolume(this.volume);
+      this.player.playVideo();
+      this.isPlaying = true;
+    } else {
+      this.pendingPlay = true;
+      this.loadApiAndCreatePlayer();
+    }
+    this.notify();
+  }
+
   public play(): void {
     this.hasError = false;
     this.hasUserPaused = false;
+    this.needsSoundActivation = false;
     if (this.player && this.isReady) {
+      if (!this.isMuted) {
+        this.player.unMute();
+      }
       this.player.playVideo();
       this.isPlaying = true;
     } else {
@@ -369,6 +490,7 @@ class YouTubeSoundSystem {
 
   public pause(): void {
     this.hasUserPaused = true;
+    this.needsSoundActivation = false;
     if (this.player && this.isReady) {
       this.player.pauseVideo();
     }
@@ -388,12 +510,22 @@ class YouTubeSoundSystem {
     if (index < 0 || index >= TRACKS.length) return;
     this.currentTrackIndex = index;
     this.hasError = false;
+    this.hasUserPaused = false;
+    this.needsSoundActivation = false;
 
-    // Immediately activate the corresponding theme for the selected track
     applyTrackTheme(index);
 
     if (this.player && this.isReady) {
+      try {
+        this.player.stopVideo();
+      } catch {
+        // Ignore stop before switch
+      }
       this.player.loadVideoById(TRACKS[index].videoId);
+      if (this.isMuted) {
+        this.isMuted = false;
+        this.player.unMute();
+      }
       this.isPlaying = true;
     } else {
       this.pendingPlay = true;
@@ -414,6 +546,9 @@ class YouTubeSoundSystem {
 
   public setMuted(muted: boolean): void {
     this.isMuted = muted;
+    if (!muted) {
+      this.needsSoundActivation = false;
+    }
     try {
       sessionStorage.setItem('vx_yt_muted', String(muted));
     } catch {
@@ -425,6 +560,7 @@ class YouTubeSoundSystem {
         this.player.mute();
       } else {
         this.player.unMute();
+        this.player.setVolume(this.volume);
       }
     }
     this.notify();
@@ -449,6 +585,24 @@ class YouTubeSoundSystem {
       }
     }
     this.notify();
+  }
+
+  public destroy(): void {
+    if (this.autoplayCheckTimer !== null) {
+      window.clearTimeout(this.autoplayCheckTimer);
+      this.autoplayCheckTimer = null;
+    }
+    if (this.player) {
+      try {
+        this.player.destroy();
+      } catch {
+        // Ignore
+      }
+      this.player = null;
+      this.isReady = false;
+      this.isPlaying = false;
+      this.initScheduled = false;
+    }
   }
 }
 

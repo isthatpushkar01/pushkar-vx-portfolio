@@ -7,7 +7,6 @@ export const Innovation: React.FC = () => {
 
   return (
     <section id="innovation" className="py-20 px-4 sm:px-6 max-w-7xl mx-auto border-t border-[#1C1C22] relative">
-      <div id="publications" className="absolute -top-20" />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
         <div>

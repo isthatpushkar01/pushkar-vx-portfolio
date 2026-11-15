@@ -21,16 +21,21 @@ export const Journey: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<string>('2026');
   const [isZooming, setIsZooming] = useState<boolean>(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const zoomTimerRef = useRef<number | null>(null);
 
   const activeMilestone: TimelineMilestone =
     milestones.find((m) => m.year === selectedYear) || milestones[0];
 
   const handleYearSelect = (year: string) => {
     if (year === selectedYear) return;
+    if (zoomTimerRef.current !== null) {
+      window.clearTimeout(zoomTimerRef.current);
+    }
     setIsZooming(true);
     setSelectedYear(year);
 
-    setTimeout(() => {
+    zoomTimerRef.current = window.setTimeout(() => {
+      zoomTimerRef.current = null;
       setIsZooming(false);
       // Smoothly ensure the panel is nicely in view
       if (panelRef.current) {
@@ -38,6 +43,14 @@ export const Journey: React.FC = () => {
       }
     }, 180);
   };
+
+  useEffect(() => {
+    return () => {
+      if (zoomTimerRef.current !== null) {
+        window.clearTimeout(zoomTimerRef.current);
+      }
+    };
+  }, []);
 
   // Keyboard navigation for year selector
   useEffect(() => {

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Terminal, FileText, Send, Menu, X, Radio } from 'lucide-react';
-import { PORTFOLIO_DATA } from '../data/portfolioData';
+import React, { useState, useEffect, useRef } from 'react';
+import { FileText, Send, Menu, X } from 'lucide-react';
 import { SoundSystem } from './SoundSystem';
 import { RecognitionStrip } from './RecognitionStrip';
 
@@ -15,10 +14,11 @@ interface NavItem {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenResume }) => {
-  const p = PORTFOLIO_DATA.personal;
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [clickedItem, setClickedItem] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const clickTimeoutRef = useRef<number | null>(null);
 
   const navItems: NavItem[] = [
     { id: 'console', label: 'CONSOLE', targetId: 'hero' },
@@ -32,13 +32,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume }) => {
     { id: 'contact', label: 'CONTACT', targetId: 'contact' },
   ];
 
-  // Synthesized mechanical click sound
+  // Synthesized mechanical click sound (reuses single AudioContext)
   const playButtonSound = () => {
     try {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      if (ctx.state === 'suspended') ctx.resume();
+      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+        audioCtxRef.current = new AudioCtx();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') {
+        void ctx.resume();
+      }
 
       const t = ctx.currentTime;
       const osc = ctx.createOscillator();
@@ -60,9 +65,20 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume }) => {
     }
   };
 
+  useEffect(() => {
+    return () => {
+      if (clickTimeoutRef.current !== null) {
+        window.clearTimeout(clickTimeoutRef.current);
+      }
+      if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+        void audioCtxRef.current.close().catch(() => {});
+      }
+    };
+  }, []);
+
   // IntersectionObserver scroll spy to highlight active section with zero layout thrashing
   useEffect(() => {
-    const sectionIds = ['hero', 'journey', 'experience', 'projects', 'skills', 'explore', 'achievements', 'certifications', 'contact'];
+    const sectionIds = ['hero', 'journey', 'experience', 'projects', 'skills', 'explore', 'publications', 'achievements', 'certifications', 'contact'];
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -92,8 +108,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume }) => {
     setActiveSection(targetId);
     setMobileMenuOpen(false);
 
-    setTimeout(() => {
+    if (clickTimeoutRef.current !== null) {
+      window.clearTimeout(clickTimeoutRef.current);
+    }
+    clickTimeoutRef.current = window.setTimeout(() => {
       setClickedItem(null);
+      clickTimeoutRef.current = null;
     }, 180);
 
     const el = document.getElementById(targetId);

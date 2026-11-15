@@ -1,59 +1,144 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  FileCheck,
   CheckCircle,
   ExternalLink,
   ChevronLeft,
   ChevronRight,
   X,
   Eye,
-  Award,
-  Sparkles,
   Maximize2,
   Minimize2,
   Download,
   ShieldCheck,
   Filter,
+  Loader2,
+  AlertCircle,
+  FileText,
 } from 'lucide-react';
 import { PORTFOLIO_DATA, Certification } from '../data/portfolioData';
+
+function renderOrgBadge(certId: string): React.ReactNode {
+  switch (certId) {
+    case 'cert-deloitte':
+      return (
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="2" y="2" width="20" height="20" rx="5" fill="#0F140A" stroke="#86BC25" strokeWidth="1.4" />
+          <text x="5.5" y="15.5" fill="#FFFFFF" fontFamily="sans-serif" fontSize="11" fontWeight="900">D</text>
+          <circle cx="16.5" cy="14.5" r="2" fill="#86BC25" />
+        </svg>
+      );
+    case 'cert-wadhwani':
+      return (
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3 8L7.5 18L12 10L16.5 18L21 8" stroke="#E03A3E" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="12" cy="5.5" r="1.5" fill="#F58220" />
+        </svg>
+      );
+    case 'cert-icessm':
+      return (
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="8.5" stroke="#D4AF37" strokeWidth="1.6" />
+          <ellipse cx="12" cy="12" rx="8.5" ry="3.8" stroke="#38BDF8" strokeWidth="1.2" />
+          <line x1="12" y1="3.5" x2="12" y2="20.5" stroke="#D4AF37" strokeWidth="1.2" />
+        </svg>
+      );
+    case 'cert-gemini':
+      return (
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2.5C12 7.75 7.75 12 2.5 12C7.75 12 12 16.25 12 21.5C12 16.25 16.25 12 21.5 12C16.25 12 12 7.75 12 2.5Z" fill="#4285F4" />
+        </svg>
+      );
+    case 'cert-isro':
+      return (
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2.5L15 8.5H9L12 2.5Z" fill="#FF6600" />
+          <rect x="10.2" y="8.5" width="3.6" height="7" fill="#3B82F6" />
+          <path d="M8.5 15.5L6.5 20.5H17.5L15.5 15.5H8.5Z" fill="#FF6600" />
+        </svg>
+      );
+    case 'cert-kit':
+      return (
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <polygon points="12,2.5 20.5,7.2 20.5,16.8 12,21.5 3.5,16.8 3.5,7.2" stroke="#FF6B00" strokeWidth="1.6" fill="rgba(255,107,0,0.12)" />
+          <circle cx="12" cy="12" r="2.8" fill="#E5A823" />
+        </svg>
+      );
+    case 'cert-tata':
+      return (
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" stroke="#0072CE" strokeWidth="1.8" />
+          <path d="M7.5 9H16.5M12 9V16.5" stroke="#38BDF8" strokeWidth="2.1" strokeLinecap="round" />
+        </svg>
+      );
+    case 'cert-walmart':
+      return (
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 3V7M12 17V21M4.5 7.5L8 9.5M16 14.5L19.5 16.5M4.5 16.5L8 14.5M16 9.5L19.5 7.5" stroke="#FFC220" strokeWidth="2.2" strokeLinecap="round" />
+          <circle cx="12" cy="12" r="2" fill="#0071CE" />
+        </svg>
+      );
+    case 'cert-buildhub':
+    default:
+      return (
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.8" stroke="#FF6600" strokeWidth="1.7" />
+          <rect x="13" y="3.5" width="7.5" height="7.5" rx="1.8" stroke="#38BDF8" strokeWidth="1.7" />
+          <rect x="3.5" y="13" width="7.5" height="7.5" rx="1.8" stroke="#A6E635" strokeWidth="1.7" />
+          <rect x="13" y="13" width="7.5" height="7.5" rx="1.8" stroke="#F5B900" strokeWidth="1.7" />
+        </svg>
+      );
+  }
+}
 
 export const Certifications: React.FC = () => {
   const certifications = PORTFOLIO_DATA.certifications;
   const [selectedCert, setSelectedCert] = useState<Certification | null>(null);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('ALL');
   const [isZoomed, setIsZoomed] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalError, setModalError] = useState(false);
 
   const categories = [
     { id: 'ALL', label: 'ALL CREDENTIALS', count: certifications.length },
-    { id: 'AI & Data', label: 'AI & DATA', count: certifications.filter(c => c.category === 'AI & Data').length },
-    { id: 'Research & Innovation', label: 'RESEARCH & INNOVATION', count: certifications.filter(c => c.category === 'Research & Innovation').length },
-    { id: 'Leadership', label: 'LEADERSHIP', count: certifications.filter(c => c.category === 'Leadership').length },
-    { id: 'Software Engineering', label: 'SOFTWARE ENGINEERING', count: certifications.filter(c => c.category === 'Software Engineering').length },
+    { id: 'AI & Data', label: 'AI & DATA', count: certifications.filter((c) => c.category === 'AI & Data').length },
+    { id: 'Research & Innovation', label: 'RESEARCH & INNOVATION', count: certifications.filter((c) => c.category === 'Research & Innovation').length },
+    { id: 'Leadership', label: 'LEADERSHIP', count: certifications.filter((c) => c.category === 'Leadership').length },
+    { id: 'Software Engineering', label: 'SOFTWARE ENGINEERING', count: certifications.filter((c) => c.category === 'Software Engineering').length },
   ];
 
-  const filteredCerts = filterCategory === 'ALL'
-    ? certifications
-    : certifications.filter((c) => c.category === filterCategory);
+  const filteredCerts =
+    filterCategory === 'ALL'
+      ? certifications
+      : certifications.filter((c) => c.category === filterCategory);
 
-  // Keyboard navigation for lightbox modal
+  const openCert = (cert: Certification) => {
+    setSelectedCert(cert);
+    setIsZoomed(false);
+    setModalError(false);
+    setModalLoading(true);
+  };
+
+  const closeCert = () => {
+    setSelectedCert(null);
+    setIsZoomed(false);
+    setModalLoading(false);
+    setModalError(false);
+  };
+
   useEffect(() => {
     if (!selectedCert) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setSelectedCert(null);
-        setIsZoomed(false);
+        closeCert();
       } else if (e.key === 'ArrowRight') {
         const currIndex = certifications.findIndex((c) => c.id === selectedCert.id);
         const nextIndex = (currIndex + 1) % certifications.length;
-        setSelectedCert(certifications[nextIndex]);
-        setIsZoomed(false);
+        openCert(certifications[nextIndex]);
       } else if (e.key === 'ArrowLeft') {
         const currIndex = certifications.findIndex((c) => c.id === selectedCert.id);
         const prevIndex = (currIndex - 1 + certifications.length) % certifications.length;
-        setSelectedCert(certifications[prevIndex]);
-        setIsZoomed(false);
+        openCert(certifications[prevIndex]);
       }
     };
 
@@ -61,25 +146,12 @@ export const Certifications: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedCert, certifications]);
 
-  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -14;
-    e.currentTarget.style.transform = `perspective(1000px) rotateX(${y.toFixed(2)}deg) rotateY(${x.toFixed(2)}deg) translateY(-8px) scale(1.025)`;
-  };
-
-  const handleCardMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    setHoveredId(null);
-    e.currentTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)';
-  };
-
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!selectedCert) return;
     const currIndex = certifications.findIndex((c) => c.id === selectedCert.id);
     const prevIndex = (currIndex - 1 + certifications.length) % certifications.length;
-    setSelectedCert(certifications[prevIndex]);
-    setIsZoomed(false);
+    openCert(certifications[prevIndex]);
   };
 
   const handleNext = (e: React.MouseEvent) => {
@@ -87,33 +159,29 @@ export const Certifications: React.FC = () => {
     if (!selectedCert) return;
     const currIndex = certifications.findIndex((c) => c.id === selectedCert.id);
     const nextIndex = (currIndex + 1) % certifications.length;
-    setSelectedCert(certifications[nextIndex]);
-    setIsZoomed(false);
+    openCert(certifications[nextIndex]);
   };
 
   return (
-    <section 
-      id="certifications" 
-      className="py-24 px-4 sm:px-6 max-w-7xl mx-auto border-t border-[#1C1C26] relative overflow-hidden select-none"
+    <section
+      id="certifications"
+      className="py-24 px-4 sm:px-6 max-w-7xl mx-auto border-t border-[#1C1C26] relative overflow-hidden"
     >
-      {/* Background Subtle Ambient Lighting */}
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] h-[550px] blur-3xl rounded-full pointer-events-none -z-10 transition-all duration-700"
+      {/* Subtle Ambient Glow */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[780px] h-[450px] rounded-full pointer-events-none -z-10 opacity-35"
         style={{
-          background: 'radial-gradient(circle, var(--theme-accent-glow, rgba(255,106,0,0.12)) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, var(--theme-accent-glow-subtle, rgba(255,106,0,0.12)) 0%, transparent 70%)',
         }}
       />
 
-      {/* Header Section */}
+      {/* Section Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
         <div>
           <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest mb-2.5">
-            <span 
-              className="w-2 h-2 rounded-full animate-ping"
-              style={{ backgroundColor: 'var(--theme-accent-light, #38BDF8)' }}
-            />
+            <ShieldCheck className="w-3.5 h-3.5" style={{ color: 'var(--theme-accent-light, #FF6A00)' }} />
             <span style={{ color: 'var(--theme-accent-light, #FF6A00)' }} className="font-bold">
-              09 // CREDENTIAL ARCHIVE & VERIFIED MILESTONES
+              09 // CREDENTIAL ARCHIVE &amp; VERIFIED MILESTONES
             </span>
           </div>
 
@@ -126,10 +194,10 @@ export const Certifications: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0D0D14] border border-[#262634] shadow-md font-mono text-xs self-start md:self-end">
-          <ShieldCheck className="w-4 h-4 text-[#A6E635]" />
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0D0D14] border border-[#262634] font-mono text-xs self-start md:self-end shrink-0">
+          <CheckCircle className="w-4 h-4 text-[#A6E635]" />
           <span className="text-white font-bold">{certifications.length}</span>
-          <span className="text-[#8E8E93]">ORIGINAL CREDENTIALS</span>
+          <span className="text-[#8E8E93]">VERIFIED CREDENTIALS · ON-DEMAND VIEW</span>
         </div>
       </div>
 
@@ -141,8 +209,9 @@ export const Certifications: React.FC = () => {
           return (
             <button
               key={cat.id}
+              type="button"
               onClick={() => setFilterCategory(cat.id)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition-all duration-200 cursor-pointer shrink-0 flex items-center gap-2 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors duration-200 cursor-pointer shrink-0 flex items-center gap-2 ${
                 isActive
                   ? 'text-white shadow-lg'
                   : 'bg-[#101017] text-[#8E8E93] hover:text-white border border-[#22222E]'
@@ -154,9 +223,11 @@ export const Certifications: React.FC = () => {
               }}
             >
               <span>{cat.label}</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded ${
-                isActive ? 'bg-black/30 text-white' : 'bg-[#1C1C26] text-[#71717A]'
-              }`}>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded ${
+                  isActive ? 'bg-black/30 text-white' : 'bg-[#1C1C26] text-[#71717A]'
+                }`}
+              >
                 {cat.count}
               </span>
             </button>
@@ -164,143 +235,87 @@ export const Certifications: React.FC = () => {
         })}
       </div>
 
-      {/* Responsive Certificate Cards Grid with 3D Hover & Lift */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-        {filteredCerts.map((cert) => {
-          const isHovered = hoveredId === cert.id;
-          const hasSiblingHovered = hoveredId !== null && !isHovered;
-
-          return (
-            <div
-              key={cert.id}
-              onClick={() => setSelectedCert(cert)}
-              onMouseEnter={() => setHoveredId(cert.id)}
-              onMouseMove={handleCardMouseMove}
-              onMouseLeave={handleCardMouseLeave}
-              className={`group relative rounded-2xl p-4 bg-[#0A0A0F] border transition-[opacity,border-color,box-shadow] duration-250 cursor-pointer flex flex-col justify-between overflow-hidden will-change-transform ${
-                hasSiblingHovered ? 'opacity-50 grayscale-[0.2]' : 'opacity-100'
-              }`}
-              style={{
-                borderColor: isHovered ? 'var(--theme-accent, #383848)' : '#20202B',
-                boxShadow: isHovered
-                  ? `0 24px 45px -10px rgba(0,0,0,0.9), 0 0 30px ${cert.brandColors.primary}33, 0 0 20px var(--theme-accent-glow-subtle)`
-                  : '0 8px 24px -6px rgba(0,0,0,0.8)',
-                zIndex: isHovered ? 30 : 1,
-              }}
-            >
-              {/* Card Ambient Rim Light Sweep */}
-              <div 
-                className="absolute inset-0 pointer-events-none transition-opacity duration-300 rounded-2xl opacity-0 group-hover:opacity-100"
-                style={{
-                  background: `radial-gradient(400px circle at 50% 0%, ${cert.brandColors.primary}22, transparent 70%)`,
-                }}
-              />
-
-              <div>
-                {/* Top Issuer Badge & Year */}
-                <div className="flex items-center justify-between pb-2.5 border-b border-[#181822] mb-3">
-                  <div className="flex items-center gap-2">
-                    <span 
-                      className="w-2 h-2 rounded-full inline-block"
-                      style={{ backgroundColor: cert.brandColors.primary }}
-                    />
-                    <span className="text-[11px] font-mono font-bold text-white uppercase truncate max-w-[190px]">
+      {/* Lightweight Metadata-Only Certificate Cards Grid (Zero Inline Scans Loaded Until Clicked) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        {filteredCerts.map((cert) => (
+          <div
+            key={cert.id}
+            className="group relative rounded-2xl p-5 sm:p-6 bg-[#0A0A10] border border-[#20202C] hover:border-[var(--theme-accent,#FF6A00)] transition-[border-color,transform,box-shadow] duration-200 hover:-translate-y-1 flex flex-col justify-between shadow-lg"
+          >
+            <div>
+              {/* Organization Badge + Year */}
+              <div className="flex items-center justify-between gap-3 pb-4 border-b border-[#181822] mb-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#12121B] border border-[#252534] flex items-center justify-center shrink-0">
+                    {renderOrgBadge(cert.id)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-mono text-[#8E8E93] uppercase tracking-wider">
+                      ISSUING ORGANIZATION
+                    </p>
+                    <p className="text-xs font-mono font-bold text-white truncate">
                       {cert.issuer}
-                    </span>
-                  </div>
-
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#14141E] border border-[#242432] text-[#A6E635] font-semibold">
-                    {cert.date}
-                  </span>
-                </div>
-
-                {/* Document Realistic Visual Preview with Original Aspect Ratio */}
-                <div className="relative rounded-xl overflow-hidden bg-[#060609] border border-[#1E1E28] mb-3.5 aspect-[1.414/1] shadow-inner group/img">
-                  <img
-                    src={cert.thumbnail || cert.image}
-                    alt={cert.title}
-                    loading="lazy"
-                    decoding="async"
-                    width={480}
-                    height={340}
-                    className="w-full h-full object-contain p-1.5 transition-transform duration-500 ease-out group-hover:scale-105"
-                  />
-
-                  {/* Document Gloss Shine Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.02] via-transparent to-white/[0.08] pointer-events-none" />
-
-                  {/* Hover Floating Pill: VIEW FULL CERTIFICATE */}
-                  <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center p-3">
-                    <span 
-                      className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-white text-[11px] font-mono font-black tracking-wider uppercase shadow-2xl transition-transform duration-200 group-hover:scale-105"
-                      style={{
-                        background: 'linear-gradient(to right, var(--theme-accent, #FF7A1A), var(--theme-accent-light, #E05500))',
-                        boxShadow: '0 0 15px var(--theme-accent-glow, rgba(255,106,0,0.5))',
-                      }}
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>VIEW FULL CERTIFICATE</span>
-                    </span>
+                    </p>
                   </div>
                 </div>
 
-                {/* Certificate Title */}
-                <h3 className="text-sm font-display font-black text-white group-hover:text-[var(--theme-accent-light,#FF6A00)] transition-colors leading-snug mb-1.5">
-                  {cert.title}
-                </h3>
-
-                {/* Certificate Type / Additional Details */}
-                <p className="text-[11px] font-mono font-semibold text-[#FF8A32] mb-1.5">
-                  {cert.certificateType}
-                  {cert.additionalDetail ? ` • ${cert.additionalDetail}` : ''}
-                </p>
-
-                {/* Credential Note */}
-                <p className="text-xs text-[#8E8E93] leading-relaxed line-clamp-2">
-                  {cert.credentialNote}
-                </p>
-              </div>
-
-              {/* Card Footer: Skills & Verified Tag */}
-              <div className="mt-4 pt-3 border-t border-[#161622] flex items-center justify-between text-[10px] font-mono">
-                <div className="flex flex-wrap gap-1 max-w-[70%]">
-                  {cert.skills.slice(0, 2).map((s, idx) => (
-                    <span 
-                      key={idx}
-                      className="px-1.5 py-0.5 rounded bg-[#12121A] text-[#8E8E93] truncate border border-[#1E1E28]"
-                    >
-                      {s}
-                    </span>
-                  ))}
-                  {cert.skills.length > 2 && (
-                    <span className="px-1 py-0.5 text-[#55555A]">
-                      +{cert.skills.length - 2}
-                    </span>
-                  )}
-                </div>
-
-                <span className="flex items-center gap-1 text-[#A6E635] font-bold shrink-0">
-                  <CheckCircle className="w-3 h-3" />
-                  <span>VERIFIED</span>
+                <span className="text-xs font-mono font-bold text-[#A6E635] shrink-0 tabular-nums">
+                  {cert.year}
                 </span>
               </div>
+
+              {/* Certificate Title */}
+              <h3 className="text-base sm:text-lg font-display font-bold text-white group-hover:text-[var(--theme-accent-light,#FF6A00)] transition-colors leading-snug mb-2">
+                {cert.title}
+              </h3>
+
+              {/* Issue Date & Category Metadata */}
+              <p className="text-[11px] font-mono text-[#8E8E93] mb-4">
+                <span>{cert.date}</span>
+                <span aria-hidden="true"> · </span>
+                <span>{cert.certificateType}</span>
+              </p>
             </div>
-          );
-        })}
+
+            {/* Action Footer */}
+            <div className="pt-4 border-t border-[#161622] flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => openCert(cert)}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#14141E] hover:bg-[#1E1E2C] text-white border border-[#2C2C3A] hover:border-[var(--theme-accent,#FF6A00)] font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                <Eye className="w-3.5 h-3.5" style={{ color: 'var(--theme-accent-light, #FF6A00)' }} />
+                <span>VIEW CERTIFICATE</span>
+              </button>
+
+              {cert.originalPdf && (
+                <a
+                  href={cert.originalPdf}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 rounded-xl bg-[#12121A] hover:bg-[#1C1C28] text-[#A1A1AA] hover:text-white border border-[#262634] transition-colors cursor-pointer"
+                  title="Open Original PDF in New Tab"
+                  aria-label={`Open ${cert.title} PDF in new tab`}
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* FULL-SCREEN CERTIFICATE LIGHTBOX MODAL */}
+      {/* ON-DEMAND CERTIFICATE LIGHTBOX MODAL */}
       {selectedCert && (
-        <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-[#040406]/94 backdrop-blur-2xl animate-in fade-in duration-200"
-          onClick={() => {
-            setSelectedCert(null);
-            setIsZoomed(false);
-          }}
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/92"
+          onClick={closeCert}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cert-modal-title"
         >
-          {/* Modal Container */}
-          <div 
-            className="relative w-full max-w-5xl max-h-[92vh] rounded-2xl bg-[#09090F] border-2 border-[#2B2B3C] shadow-[0_30px_90px_rgba(0,0,0,0.98)] overflow-hidden flex flex-col transition-all duration-300"
+          <div
+            className="relative w-full max-w-5xl max-h-[92vh] rounded-2xl bg-[#09090F] border-2 overflow-hidden flex flex-col shadow-2xl"
             style={{
               borderColor: 'var(--theme-accent, #2B2B3C)',
               boxShadow: '0 25px 90px rgba(0,0,0,0.98), 0 0 35px var(--theme-accent-glow-subtle)',
@@ -308,128 +323,152 @@ export const Certifications: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Top Chrome */}
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 bg-gradient-to-r from-[#14141E] via-[#0E0E14] to-[#14141E] border-b border-[#222230]">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <span 
-                  className="w-2.5 h-2.5 rounded-full shrink-0 animate-pulse"
-                  style={{ backgroundColor: selectedCert.brandColors.primary }}
-                />
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 bg-[#12121A] border-b border-[#222230]">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-[#181824] border border-[#2A2A38] flex items-center justify-center shrink-0">
+                  {renderOrgBadge(selectedCert.id)}
+                </div>
                 <div className="min-w-0">
-                  <h3 className="text-xs sm:text-sm font-display font-black text-white uppercase truncate">
+                  <h3 id="cert-modal-title" className="text-xs sm:text-sm font-display font-black text-white uppercase truncate">
                     {selectedCert.title}
                   </h3>
                   <p className="text-[10px] font-mono text-[#8E8E93] truncate">
-                    ISSUED BY {selectedCert.issuer} • {selectedCert.date}
+                    {selectedCert.issuer} · {selectedCert.date}
                   </p>
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex items-center gap-2 shrink-0">
-                {/* Zoom Toggle */}
                 <button
-                  onClick={() => setIsZoomed(!isZoomed)}
-                  className="p-1.5 rounded-lg bg-[#181824] hover:bg-[#222232] text-[#D4D4D8] hover:text-white border border-[#2B2B3C] transition-colors cursor-pointer"
+                  type="button"
+                  onClick={() => setIsZoomed((z) => !z)}
+                  className="p-2 rounded-lg bg-[#181824] hover:bg-[#222232] text-[#D4D4D8] hover:text-white border border-[#2B2B3C] transition-colors cursor-pointer"
                   title={isZoomed ? 'Reset Zoom' : 'Zoom In'}
                 >
                   {isZoomed ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                 </button>
 
-                {/* View Original Asset Link */}
                 <a
                   href={selectedCert.originalPdf || selectedCert.image}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-1.5 rounded-lg bg-[#181824] hover:bg-[#222232] text-[#D4D4D8] hover:text-white border border-[#2B2B3C] transition-colors cursor-pointer"
+                  className="p-2 rounded-lg bg-[#181824] hover:bg-[#222232] text-[#D4D4D8] hover:text-white border border-[#2B2B3C] transition-colors cursor-pointer"
                   title="Open Original Document in New Tab"
                 >
                   <ExternalLink className="w-4 h-4" />
                 </a>
 
-                {/* Close Button */}
                 <button
-                  onClick={() => {
-                    setSelectedCert(null);
-                    setIsZoomed(false);
-                  }}
-                  className="p-1.5 rounded-lg bg-[#241414] hover:bg-[#341818] text-[#FF7A7A] hover:text-white border border-[#442020] transition-colors cursor-pointer"
+                  type="button"
+                  onClick={closeCert}
+                  className="p-2 rounded-lg bg-[#241414] hover:bg-[#341818] text-[#FF7A7A] hover:text-white border border-[#442020] transition-colors cursor-pointer"
                   title="Close Certificate Viewer (Esc)"
+                  aria-label="Close certificate modal"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Document Display Canvas */}
-            <div className="relative flex-1 bg-[#050508] p-3 sm:p-6 overflow-auto flex items-center justify-center min-h-[300px]">
-              {/* Prev Stepper Button */}
+            {/* On-Demand Document Display Canvas */}
+            <div className="relative flex-1 bg-[#050508] p-3 sm:p-6 overflow-auto flex items-center justify-center min-h-[320px]">
               <button
+                type="button"
                 onClick={handlePrev}
-                className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full bg-[#111118]/80 hover:bg-[#1C1C28] text-white border border-[#2C2C3E] backdrop-blur-md shadow-2xl transition-all cursor-pointer active:scale-95"
+                className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full bg-[#111118]/90 hover:bg-[#1C1C28] text-white border border-[#2C2C3E] shadow-2xl transition-colors cursor-pointer"
                 title="Previous Certificate (Left Arrow)"
+                aria-label="Previous certificate"
               >
                 <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
 
-              {/* Next Stepper Button */}
               <button
+                type="button"
                 onClick={handleNext}
-                className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full bg-[#111118]/80 hover:bg-[#1C1C28] text-white border border-[#2C2C3E] backdrop-blur-md shadow-2xl transition-all cursor-pointer active:scale-95"
+                className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full bg-[#111118]/90 hover:bg-[#1C1C28] text-white border border-[#2C2C3E] shadow-2xl transition-colors cursor-pointer"
                 title="Next Certificate (Right Arrow)"
+                aria-label="Next certificate"
               >
                 <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
 
-              {/* Main Image (Uncropped, Full Quality) */}
-              <div 
-                className={`transition-all duration-300 max-w-full flex items-center justify-center ${
-                  isZoomed ? 'scale-125 sm:scale-140 cursor-zoom-out' : 'cursor-zoom-in'
-                }`}
-                onClick={() => setIsZoomed(!isZoomed)}
-              >
-                <img
-                  src={selectedCert.image}
-                  alt={selectedCert.title}
-                  className="max-h-[60vh] sm:max-h-[66vh] w-auto max-w-full object-contain rounded-lg shadow-[0_15px_50px_rgba(0,0,0,0.9)] border border-[#20202A]"
-                />
-              </div>
+              {modalLoading && !modalError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-xs font-mono text-[#8E8E93] pointer-events-none">
+                  <Loader2 className="w-6 h-6 animate-spin text-[#FF8A32]" />
+                  <span>Loading Original Certificate Asset...</span>
+                </div>
+              )}
+
+              {modalError ? (
+                <div className="text-center font-mono text-xs text-[#A1A1AA] space-y-3 p-6 max-w-md">
+                  <AlertCircle className="w-8 h-8 text-[#FF7A7A] mx-auto" />
+                  <p className="text-white font-bold">Could not load certificate preview inline.</p>
+                  <a
+                    href={selectedCert.originalPdf || selectedCert.image}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#FF6A00] text-black font-bold uppercase"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Open Original File</span>
+                  </a>
+                </div>
+              ) : (
+                <div
+                  className={`transition-transform duration-200 max-w-full flex items-center justify-center ${
+                    isZoomed ? 'scale-125 sm:scale-140 cursor-zoom-out' : 'cursor-zoom-in'
+                  }`}
+                  onClick={() => setIsZoomed((z) => !z)}
+                >
+                  <img
+                    key={selectedCert.id}
+                    src={selectedCert.image}
+                    alt={selectedCert.title}
+                    onLoad={() => setModalLoading(false)}
+                    onError={() => {
+                      setModalLoading(false);
+                      setModalError(true);
+                    }}
+                    className={`max-h-[60vh] sm:max-h-[66vh] w-auto max-w-full object-contain rounded-lg shadow-[0_15px_50px_rgba(0,0,0,0.9)] border border-[#20202A] transition-opacity duration-200 ${
+                      modalLoading ? 'opacity-0' : 'opacity-100'
+                    }`}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Bottom Metadata Drawer */}
             <div className="px-4 sm:px-6 py-3.5 bg-[#0D0D14] border-t border-[#1C1C28] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
               <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[#A1A1AA]">
                 <span className="text-white font-bold">{selectedCert.certificateType}</span>
-                <span>•</span>
+                <span aria-hidden="true">·</span>
                 <span>{selectedCert.date}</span>
                 {selectedCert.certificateId && (
                   <>
-                    <span>•</span>
+                    <span aria-hidden="true">·</span>
                     <span className="text-[#38BDF8]">ID: {selectedCert.certificateId}</span>
                   </>
                 )}
                 {selectedCert.verificationCodes && (
                   <>
-                    <span>•</span>
+                    <span aria-hidden="true">·</span>
                     <span className="text-[#A6E635] truncate max-w-xs">{selectedCert.verificationCodes}</span>
                   </>
                 )}
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-[10px] text-[#55555A] hidden md:inline">
-                  USE ARROW KEYS OR SWIPE TO NAVIGATE
-                </span>
                 <a
                   href={selectedCert.originalPdf || selectedCert.image}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-black font-bold uppercase transition-all shadow-md cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-black font-bold uppercase transition-all shadow-md cursor-pointer"
                   style={{
                     background: 'linear-gradient(to right, var(--theme-accent-light, #FF7A1A), var(--theme-accent, #E05500))',
                   }}
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>VIEW FULL SIZE</span>
+                  <span>{selectedCert.originalPdf ? 'OPEN ORIGINAL PDF' : 'OPEN FULL SIZE'}</span>
                 </a>
               </div>
             </div>

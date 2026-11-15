@@ -118,6 +118,7 @@ export const PORTFOLIO_DATA = {
     phone: '+91 9691585949',
     linkedin: 'https://www.linkedin.com/in/pushkar-vishwakarma-0b759a37a',
     github: 'https://github.com/isthatpushkar01',
+    instagram: 'https://www.instagram.com/_is.that.pushkar_?psln=MW9yZ29jeXlsejVpbw==',
     communitySize: '3,000+ followers',
     education: {
       degree: 'B.Tech – Artificial Intelligence & Machine Learning',
@@ -148,7 +149,7 @@ I believe in learning by building, leading through action and creating technolog
       duration: 'April 2025 – Present',
       status: 'In Active Development',
       description: 'An AI-powered employability ecosystem connecting students, Training & Placement Officers (TPOs), and recruiters through intelligent skill assessment, career recommendations, and employability analytics.',
-      image: '/src/assets/images/skillbridge_ai_preview_1794061672635.jpg',
+      image: 'skillbridge_preview',
       coreFeatures: [
         'Verified digital student profiles with comprehensive skill evidence',
         'Multi-dimensional skill assessments and competency records',
@@ -181,7 +182,7 @@ I believe in learning by building, leading through action and creating technolog
       duration: 'September 2025 – Present',
       status: 'In Active Development',
       description: 'An AI-driven agricultural decision-support platform designed to empower farmers with crop analysis, environmental monitoring, intelligent advisory alerts, and actionable data-driven farming insights.',
-      image: '/src/assets/images/agrisense_ai_preview_1794061673877.jpg',
+      image: 'agrisense_preview',
       coreFeatures: [
         'High-resolution crop health analysis and real-time monitoring',
         'Agricultural environmental data modeling and soil diagnostics',
@@ -207,7 +208,7 @@ I believe in learning by building, leading through action and creating technolog
       duration: 'October 2026 – Present',
       status: 'Collaborative Research',
       description: 'An AI-powered environmental monitoring solution engineered to support water-quality assessment, pollution-risk analysis, environmental sensor data validation, and evidence-based ecological decision-making.',
-      image: '/src/assets/images/ghatshield_ai_preview_1794061673742.jpg',
+      image: 'ghatshield_preview',
       coreFeatures: [
         'Water-quality assessment workflows using river sensor networks',
         'Environmental data validation and outlier noise filtering',

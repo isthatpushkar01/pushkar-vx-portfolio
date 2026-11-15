@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Navigation, Compass, Radio, CheckCircle, ArrowRight, Play, RotateCcw } from 'lucide-react';
 import { PORTFOLIO_DATA } from '../data/portfolioData';
 import { OrbitalResearchSatellite } from './CyberneticEasterEggs';
@@ -8,16 +8,33 @@ export const Explore: React.FC = () => {
   const [activeLoc, setActiveLoc] = useState(locations[0]);
   const [isSimulating, setIsSimulating] = useState(false);
   const [simProgress, setSimProgress] = useState(0);
+  const intervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []);
 
   const startTransitSimulation = () => {
     if (isSimulating) return;
     setIsSimulating(true);
     setSimProgress(0);
 
-    const interval = setInterval(() => {
+    if (intervalRef.current !== null) {
+      window.clearInterval(intervalRef.current);
+    }
+
+    intervalRef.current = window.setInterval(() => {
       setSimProgress((prev) => {
         if (prev >= 100) {
-          clearInterval(interval);
+          if (intervalRef.current !== null) {
+            window.clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
           setIsSimulating(false);
           setActiveLoc(locations[1]);
           return 100;

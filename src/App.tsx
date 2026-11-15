@@ -14,6 +14,7 @@ import { Skills } from './components/Skills';
 import { Innovation } from './components/Innovation';
 import { Explore } from './components/Explore';
 import { Achievements } from './components/Achievements';
+import { ResearchPublications } from './components/ResearchPublications';
 import { Certifications } from './components/Certifications';
 import { BeyondTech } from './components/BeyondTech';
 import { Contact } from './components/Contact';
@@ -22,7 +23,8 @@ import { ResumeModal } from './components/ResumeModal';
 import { CustomCursor } from './components/CustomCursor';
 import { CommunityLogoWall } from './components/CommunityLogoWall';
 import { WebSlingingCyberHero } from './components/CyberneticEasterEggs';
-import { Terminal, Keyboard, Sparkles } from 'lucide-react';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { Keyboard } from 'lucide-react';
 
 export default function App() {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
@@ -68,36 +70,47 @@ export default function App() {
       {/* Subtle Distant Cybernetic Easter Egg */}
       <WebSlingingCyberHero />
 
-      {/* Official YouTube IFrame Player Persistent Node */}
+      {/* Official YouTube IFrame Player Persistent Node (in-viewport 1x1 prevents Chromium compositor culling) */}
       <div 
         id="yt-embedded-soundtrack-player" 
         aria-hidden="true" 
-        className="fixed -top-[9999px] -left-[9999px] w-1 h-1 opacity-0 pointer-events-none" 
+        className="fixed bottom-0 right-0 w-px h-px overflow-hidden opacity-0 pointer-events-none" 
       />
 
       {/* Dynamic ambient mouse spotlight */}
-      <div ref={spotlightRef} className="fixed inset-0 spotlight-overlay z-30 pointer-events-none" />
+      <div ref={spotlightRef} className="fixed inset-0 spotlight-overlay z-0 pointer-events-none" />
 
       {/* Navigation */}
       <Navbar onOpenResume={() => setIsResumeOpen(true)} />
 
       {/* Main Content Sections */}
       <main className="relative z-10">
-        <Hero onOpenResume={() => setIsResumeOpen(true)} />
+        <ErrorBoundary sectionName="Hero">
+          <Hero onOpenResume={() => setIsResumeOpen(true)} />
+        </ErrorBoundary>
         <About />
         <Journey />
         <Experience />
-        <Projects />
+        <ErrorBoundary sectionName="Projects">
+          <Projects />
+        </ErrorBoundary>
         <Skills />
         <Innovation />
         <Explore />
         <Achievements />
-        <Certifications />
+        <ErrorBoundary sectionName="Research & Publications">
+          <ResearchPublications />
+        </ErrorBoundary>
+        <ErrorBoundary sectionName="Certifications">
+          <Certifications />
+        </ErrorBoundary>
         <BeyondTech />
-        <Contact onOpenResume={() => setIsResumeOpen(true)} />
+        <ErrorBoundary sectionName="Contact">
+          <Contact onOpenResume={() => setIsResumeOpen(true)} />
+        </ErrorBoundary>
       </main>
 
-      {/* Distinctive Animated Bottom Community Logo Wall (Requirement 5) */}
+      {/* Distinctive Animated Bottom Community Logo Wall */}
       <CommunityLogoWall />
 
       {/* Footer */}
